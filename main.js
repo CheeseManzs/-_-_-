@@ -1,9 +1,12 @@
+const funclib1 = require('./funclib1');
+const rep = require('./repsystem')
 const { Console } = require('console');
 const { Client, Intents } = require('discord.js');
+const { text } = require('stream/consumers');
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
 const token = 'OTA2MjkxMTkyNzI2MTg4MDYy.YYWfcg.qq2O5WSasMmB50X7F4GxeO8vsDk'
 //prefix that people use
-const pre = '!'
+const pre = 'sh!'
 //just letting me know when it goes live...
 client.once('ready', () => {
     
@@ -14,25 +17,29 @@ client.once('ready', () => {
 
 //dictionary of commands
 var cmdDict = new Map();
-cmdDict.set('hi', test);
-
-
+cmdDict.set('hi', funclib1.test);
 
 client.on('messageCreate', (message) => {
+    rep.modify_user(message.guildId, message.author.id, 10);
     if(!message.content.startsWith(pre) || message.author.bot){ return;}
-    const args = message.content.slice(pre.length).split(/ + /)
-    const command = args.shift().toLowerCase();
-    console.log(command)
-    console.log(cmdDict.get(command));
-    if(cmdDict.get(command) != undefined){
-        cmdDict.get(command)(message);
+    //get arguments
+    var args = []
+    toadd = message.content.slice(pre.length).split(" ")
+    //add in the arguments
+    toadd.forEach(element => {
+        console.log(element)
+        args.push(element.toLowerCase());
+    });
+    console.log(args)
+    const command = args;
+    console.log(cmdDict.get(command[0]))
+    if(cmdDict.get(command[0]) != undefined){
+        cmdDict.get(command[0])(message);
     }
 
 });
 
-function test(message){
-    message.channel.send("pain.")
-}
+
   
 
 
