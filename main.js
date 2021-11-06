@@ -20,10 +20,15 @@ var cmdDict = new Map();
 cmdDict.set('hi', funclib1.test);
 
 client.on('messageCreate', (message) => {
+
+    //reputation monitor
+    if(message.author.bot){ return;}
     console.log("modifying reputation!")
     rep.modify_user(message.guildId, message.author.id, 0.01)
+    rep.get_rep(message.guildId, message.author.id)
     message.channel.send("Updating Reputation");
-    if(!message.content.startsWith(pre) || message.author.bot){ return;}
+    //command detection
+    if(!message.content.startsWith(pre)){ return;}
     //get arguments
     var args = []
     toadd = message.content.slice(pre.length).split(" ")
