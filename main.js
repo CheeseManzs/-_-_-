@@ -1,6 +1,8 @@
 const funclib1 = require('./funclib1');
 const config = require('./config')
 const rep = require('./repsystem')
+const timer = require('./timers')
+const fs = require('fs');
 const { Console } = require('console');
 const { Client, Intents, MessageEmbed } = require('discord.js');
 const { text } = require('stream/consumers');
@@ -22,6 +24,7 @@ cmdDict.set('wiki', funclib1.searchwiki)
 cmdDict.set('wikipedia', funclib1.searchwiki)
 cmdDict.set('search', funclib1.searchwiki)
 cmdDict.set('mute', funclib1.mute)
+cmdDict.set('set timer', timer.create)
 
 function resolveAfterTSeconds(t) {
     return new Promise(resolve => {
