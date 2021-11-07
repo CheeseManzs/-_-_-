@@ -8,8 +8,7 @@ const token = 'OTA2MjkxMTkyNzI2MTg4MDYy.YYWfcg.qq2O5WSasMmB50X7F4GxeO8vsDk'
 //prefix that people use
 const pre = 'sh!'
 //just letting me know when it goes live...
-client.once('ready', () => {
-    
+client.once('ready', async() => {
     console.log("Shrugbot is live!");
 
 
@@ -35,11 +34,13 @@ async function getreputation(message, args)
     try{
         if(client.guilds.cache.get(message.guildId).members.cache.get(args[0]) != undefined){
             console.log("args[0]: " + args[0])
-            var target = args[0].replace("<","").replace(">","").replace("@","").replace("!","")
+            var target = args[0]
             var repvalue = await rep.get_rep(message.guildId, target);
+            var reprank = await rep.get_rank(message.guildId, target);
+
             var repvalue = Math.round(repvalue*100)
             var targetname = client.users.cache.find(user => user.id === args[0]).username;
-            message.channel.send(targetname+": "+repvalue);
+            message.channel.send(targetname+": **"+repvalue+"**/**"+Math.ceil(rank_formula(reprank+1)*100)+"** to Rank **" + (reprank+1) + "**");
         }else
         {
             message.channel.send("That person is not in this server!")
@@ -51,14 +52,50 @@ async function getreputation(message, args)
     }
 }
 
+function rank_formula(x)
+{
+    console.log(x);
+    return Math.pow(parseFloat(Number(x)), 1.030);
+}
+function factorial (n) {
+    if (n == 0 || n == 1)
+      return 1;
+    if (f[n] > 0)
+      return f[n];
+    return f[n] = factorial(n-1) * n;
+  }
+
 
 client.on('messageCreate', async(message) => {
 
     //reputation monitor
     if(message.author.bot){ return;}
+    await rep.init(message.guildId, message.author.id);
     if(message.content.replace(/ /g, "").length >= 4)
     {
         var offenses = await rep.get_off(message.guildId, message.author.id);
+        var repu = await rep.get_rep(message.guildId, message.author.id);
+        var rank = await rep.get_rank(message.guildId, message.author.id);
+        var targrank = rank+1;
+        var rankform = (rank_formula(targrank))
+        console.log(targrank + " | " + rank + " |-| " + rank_formula(targrank) + " | " + repu);
+        if(rank != null && rank % 1 == 0)
+        {
+            while(repu > rank_formula(targrank))
+            {
+                targrank++;
+                console.log(targrank + "<- new");
+            }
+            while(repu < rank_formula(targrank-2))
+            {
+                targrank--;
+            }
+            if((targrank-1) != rank)
+            {
+                await rep.set_rank(message.guildId, message.author.id, targrank); 
+                message.channel.send("<@"+message.author.id+"> has **ranked up!** (Rank **"+targrank+"**)");
+            }
+        }
         //console.log(offenses)
         //console.log(offenses+1)
         await rep.modify_user(message.guildId, message.author.id, 0.005/((offenses+1)/5));
