@@ -45,4 +45,4 @@ function create(guildID, uID, message)
 	
     console.log("100% - closed!")
 }
-module.exports = {modify_user}
+module.exports = {create}
