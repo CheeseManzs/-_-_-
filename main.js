@@ -41,23 +41,44 @@ async function getreputation(message, args)
             var target = args[0]
             var repvalue = await rep.get_rep(message.guildId, target);
             var reprank = await rep.get_rank(message.guildId, target);
-
+            var oldvalue = repvalue
             var repvalue = Math.round(repvalue*100)
             var targetname = client.users.cache.find(user => user.id === args[0]).username;
             if(repvalue < Math.ceil(rank_formula(reprank+1)*100) )
             {
+
                 var mes = "**"+repvalue+"**/**"+Math.ceil(rank_formula(reprank+1)*100)+"**";
+                var rankdis = reprank;
+                if(rankdis == null)
+                {
+                    rankdis = 0;
+                }
                 var unt = "**"+(Math.ceil(rank_formula(reprank+1)*100) - repvalue)+"** until Rank **" + (reprank+1)+"**";
                 mes = String(mes);
+                var rankpercent = ((oldvalue-rank_formula(reprank))/(rank_formula(reprank+1)-rank_formula(reprank)));
+                var scale = 2;
+                var roundedpercent = parseInt(Math.floor(rankpercent*10*scale));
+                var rankbar = "["+rankdis+"]"
+                for(var i = 0; i < 10*scale; i++)
+                {
+                    console.log(i + " - " + roundedpercent)
+                    if(i == roundedpercent)
+                    {
+                        rankbar += "o";
+                    }else{
+                        rankbar += "-";
+                    }
+                }
+                rankbar += "["+(rankdis+1)+"]"
                 const newembed = new MessageEmbed()
                 .setColor('#5F676F')
                 .setTitle(targetname)
                 .setImage(client.users.cache.find(user => user.id === args[0]).avatarURL())
-                .setFooter("Reputation is an indicator of a person's behaviour in a server")
+                .setFooter("Reputation is an indicator of a person's activity and behaviour in a server")
                 .addFields(
                     {name: "Reputation", value: mes},
-                    {name: "--------------------", value: "Rank **" + String(reprank)+"**"},     
-                    {name: "--------------------", value: unt}                  
+                    {name: "*Rank Information:*", value: "Rank **" + String(rankdis)+"**"},     
+                    {name: rankbar, value: unt}                  
                 );
                 message.reply({embeds: [newembed]});
             }
@@ -75,9 +96,9 @@ async function getreputation(message, args)
 function rank_formula(x)
 {
     console.log(x);
-    if(x < 0)
+    if(x <= 0)
     {
-        return 0;
+        return -100;
     }else
     {
         return x + Math.pow(parseFloat(Number(x)), 1.030);

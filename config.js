@@ -6,7 +6,7 @@ rank_roles=["neutral","warming up","active member","saint"]
 //the ranks at which the roles will be given
 rank_levels=[1,2,3,4]
 //the speed at which people gain and lose reputation 
-rep_speed = 20
+rep_speed = 1
 
 
 
