@@ -1,5 +1,5 @@
 const { func } = require('assert-plus');
-
+const config = require('./config')
 const sql3 = require('sqlite3').verbose();
 function get_value(db, guildID){
 

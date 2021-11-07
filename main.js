@@ -1,7 +1,8 @@
 const funclib1 = require('./funclib1');
+const config = require('./config')
 const rep = require('./repsystem')
 const { Console } = require('console');
-const { Client, Intents } = require('discord.js');
+const { Client, Intents, MessageEmbed } = require('discord.js');
 const { text } = require('stream/consumers');
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
 const token = 'OTA2MjkxMTkyNzI2MTg4MDYy.YYWfcg.qq2O5WSasMmB50X7F4GxeO8vsDk'
@@ -43,7 +44,23 @@ async function getreputation(message, args)
 
             var repvalue = Math.round(repvalue*100)
             var targetname = client.users.cache.find(user => user.id === args[0]).username;
-            message.channel.send(targetname+": **"+repvalue+"**/**"+Math.ceil(rank_formula(reprank+1)*100)+"** (**"+(Math.ceil(rank_formula(reprank+1)*100) - repvalue)+"** until Rank **" + (reprank) + ")**");
+            if(repvalue < Math.ceil(rank_formula(reprank+1)*100) )
+            {
+                var mes = "**"+repvalue+"**/**"+Math.ceil(rank_formula(reprank+1)*100)+"**";
+                var unt = "**"+(Math.ceil(rank_formula(reprank+1)*100) - repvalue)+"** until Rank **" + (reprank+1)+"**";
+                mes = String(mes);
+                const newembed = new MessageEmbed()
+                .setColor('#5F676F')
+                .setTitle(targetname)
+                .setImage(client.users.cache.find(user => user.id === args[0]).avatarURL())
+                .setFooter("Reputation is an indicator of a person's behaviour in a server")
+                .addFields(
+                    {name: "Reputation", value: mes},
+                    {name: "--------------------", value: "Rank **" + String(reprank)+"**"},     
+                    {name: "--------------------", value: unt}                  
+                );
+                message.reply({embeds: [newembed]});
+            }
         }else
         {
             message.channel.send("That person is not in this server!")
@@ -58,7 +75,13 @@ async function getreputation(message, args)
 function rank_formula(x)
 {
     console.log(x);
-    return Math.pow(parseFloat(Number(x)), 1.030);
+    if(x < 0)
+    {
+        return 0;
+    }else
+    {
+        return x + Math.pow(parseFloat(Number(x)), 1.030);
+    }
 }
 function factorial (n) {
     if (n == 0 || n == 1)
@@ -76,10 +99,13 @@ client.on('messageCreate', async(message) => {
     await rep.init(message.guildId, message.author.id);
     if(message.content.replace(/ /g, "").length >= 4)
     {
+        
         var offenses = await rep.get_off(message.guildId, message.author.id);
         var repu = await rep.get_rep(message.guildId, message.author.id);
         var rank = await rep.get_rank(message.guildId, message.author.id);
-        var targrank = rank+1;
+        await rep.modify_user(message.guildId, message.author.id, (0.005/((offenses+1)/5))*config.rep_speed);
+        repu += (0.005/((offenses+1)/5))*config.rep_speed;
+        var targrank = rank;
         var rankform = (rank_formula(targrank))
         console.log(targrank + " | " + rank + " |-| " + rank_formula(targrank) + " | " + repu);
         if(rank != null && rank % 1 == 0)
@@ -89,19 +115,22 @@ client.on('messageCreate', async(message) => {
                 targrank++;
                 console.log(targrank + "<- new");
             }
-            while(repu < rank_formula(targrank-2))
+            if((targrank-1) != rank && targrank > 0)
             {
-                targrank--;
-            }
-            if((targrank-1) != rank)
-            {
-                await rep.set_rank(message.guildId, message.author.id, targrank); 
-                message.channel.send("<@"+message.author.id+"> has **ranked up!** (Rank **"+targrank+"**)");
+                //rank up
+                var newrank = (targrank-1);
+                await rep.set_rank(message.guildId, message.author.id, newrank); 
+                var sentmessage = message.channel.send("<@"+message.author.id+"> has **ranked up!** (Rank **"+(newrank)+"**)");
+                if(config.rank_levels.includes(targrank))
+                {
+                    rolename = config.rank_roles[config.rank_levels.indexOf(targrank)]
+                    roletoAdd = message.guild.roles.cache.find(role => role.name.toLowerCase().includes(rolename));
+                    (await sentmessage).mentions.members.first().roles.add(roletoAdd);
+                }
             }
         }
         //console.log(offenses)
         //console.log(offenses+1)
-        await rep.modify_user(message.guildId, message.author.id, 0.005/((offenses+1)/5));
         //console.log("modified reputation for '" + message.author.username+"'");
         //console.log(await rep.get_rep(message.guildId, message.author.id))
         //line below is an example on how to get reputation

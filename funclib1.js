@@ -1,5 +1,5 @@
 const wiki = require('wikijs').default;
-
+const config = require('./config')
 async function searchwiki(message, args)
 {
     
@@ -40,6 +40,11 @@ async function searchwiki(message, args)
 function mute(msg)
 {
     try{
+        if (!msg.member.hasPermission("MANAGE_MESSAGES")) return msg.channel.send("You don't have the permissions");
+        if (!muteUser) return msg.channel.send("You have to mention a valid member");
+        if (!muteChannel) return msg.channel.send("There's no channel called modlogs");
+        if (!muteRole) return msg.channel.send("There's no role called muted");
+        if (!msg.guild.member(client.user.id).hasPermission("MANAGE_ROLES")) return msg.channel.send("I Don't have permissions");
         var muteRole = msg.guild.roles.cache.find(role => role.name.toLowerCase().includes("muted"));
         var muteUser = msg.mentions.members.first();
         muteUser.roles.add(muteRole);
