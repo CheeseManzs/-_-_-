@@ -1,7 +1,7 @@
 const { func } = require('assert-plus');
 
 const sql3 = require('sqlite3').verbose();
-
+const fs = require('fs');
 
 
 
@@ -13,12 +13,11 @@ function create(guildID, uID, message)
 	//if frequency is weekly, number is 1-7, monday-sunday
 	//if frequency is monthly, number is 1-31, representing a day
     let db = new sql3.Database('rep.db');
-	var st = message.toLowerCase();
+	var st = message;
 	var parameters = [];
-	st = st.substring(st.indexOf(' ') + 1);
-	parameters[0] = st;
-	parameters[0] = parameters[0].substring(0, parameters[0].indexOf(' '));
-	st = st.substring(st.indexOf(' ') + 1);
+	st = st.substring(st.indexOf('"') + 1);
+	parameters[0] = st.substring(0, st.lastIndexOf('"'));
+	st = st.substring(st.lastIndexOf('"') + 2);
 	parameters[1] = st;
 	parameters[1] = parameters[1].substring(0, parameters[1].indexOf(' '));
 	st = st.substring(st.indexOf(' ') + 1);
@@ -26,27 +25,24 @@ function create(guildID, uID, message)
 	parameters[2] = parameters[2].substring(0, parameters[2].indexOf(' '));
 	st = st.substring(st.indexOf(' ') + 1);
 	parameters[3] = st;
+	parameters[3] = parameters[3].substring(0, parameters[3].indexOf(' '));
+	st = st.substring(st.indexOf(' ') + 1);
+	parameters[4] = st;
 	console.log(parameters[0]);
 	console.log(parameters[1]);
 	console.log(parameters[2]);
 	console.log(parameters[3]);
+	console.log(parameters[4]);
 	
-    db.serialize(function() {
-        //actual sqlite3 code
-        console.log("0%")
-        db.run('CREATE TABLE IF NOT EXISTS t'+guildID+' (message text, time text)', function(err){console.log("")});
-        console.log("33%")
-        // IF NOT EXISTS(SELECT 1 FROM g"+guildID+" WHERE uID="+uID+") 
-        console.log("INSERT INTO g"+guildID+" VALUES ("+uID+","+amt+")");
-        db.run("INSERT INTO g"+guildID+" VALUES ("+uID+","+amt+")", function(err){console.log()})
-        console.log("67%")
-        db.each("SELECT uID, value FROM g"+guildID, function(err, row){
-
-            console.log(row);
-
-        });
-    });
-    db.close();
+    var json = JSON.parse(fs.readFile("timers.json"));
+	if(typeof(json["g" + guildID]) == "undefined") {
+		json["g" + guildID] = {};
+	}
+	json["g" + guildID].message = message;
+	json["g" + guildID].params = parameters;
+	
+	
+	
     console.log("100% - closed!")
 }
 module.exports = {modify_user}
