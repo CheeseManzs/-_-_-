@@ -18,9 +18,9 @@ async function init(guildID, uID)
 {
     let db = new sql3.Database('rep.db');
     db.run("CREATE TABLE IF NOT EXISTS g"+guildID+"(uID int, value real, offenses int, rank int, UNIQUE(uID))", function(err){if(err){console.log("1: " + err.message)}});
-    await resolveAfterTSeconds(0.1, 10);
+    await resolveAfterTSeconds(0.02, 10);
     db.run("INSERT INTO g"+guildID+" VALUES ("+uID+",0,0,0);",function(err){if(err){}});
-    await resolveAfterTSeconds(0.1, 10);
+    await resolveAfterTSeconds(0.02, 10);
     return true;
 }
 

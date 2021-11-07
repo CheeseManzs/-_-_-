@@ -16,8 +16,11 @@ client.once('ready', async() => {
 
 //dictionary of commands
 var cmdDict = new Map();
-cmdDict.set('hi', funclib1.test);
 cmdDict.set('rep', getreputation)
+cmdDict.set('wiki', funclib1.searchwiki)
+cmdDict.set('wikipedia', funclib1.searchwiki)
+cmdDict.set('search', funclib1.searchwiki)
+cmdDict.set('mute', funclib1.mute)
 
 function resolveAfterTSeconds(t) {
     return new Promise(resolve => {
@@ -40,7 +43,7 @@ async function getreputation(message, args)
 
             var repvalue = Math.round(repvalue*100)
             var targetname = client.users.cache.find(user => user.id === args[0]).username;
-            message.channel.send(targetname+": **"+repvalue+"**/**"+Math.ceil(rank_formula(reprank+1)*100)+"** to Rank **" + (reprank+1) + "**");
+            message.channel.send(targetname+": **"+repvalue+"**/**"+Math.ceil(rank_formula(reprank+1)*100)+"** (**"+(Math.ceil(rank_formula(reprank+1)*100) - repvalue)+"** until Rank **" + (reprank) + ")**");
         }else
         {
             message.channel.send("That person is not in this server!")
