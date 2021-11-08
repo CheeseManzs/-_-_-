@@ -5,15 +5,16 @@ const fs = require('fs');
 
 
 
-function create(guildID, uID, message)
+function create(message, args)
 {
+	console.log(message);
 	//takes in a recurring timer in the form of "timer [frequency] [number] [hour] [minute]"
 	//frequency can be daily, weekly, or monthly
 	//if frequency is daily, ignore number
 	//if frequency is weekly, number is 1-7, monday-sunday
 	//if frequency is monthly, number is 1-31, representing a day
     let db = new sql3.Database('rep.db');
-	var st = message;
+	var st = message.content;
 	var parameters = [];
 	st = st.substring(st.indexOf('"') + 1);
 	parameters[0] = st.substring(0, st.lastIndexOf('"'));
@@ -33,15 +34,15 @@ function create(guildID, uID, message)
 	console.log(parameters[2]);
 	console.log(parameters[3]);
 	console.log(parameters[4]);
-	
-    var json = JSON.parse(fs.readFile("timers.json"));
-	if(typeof(json["g" + guildID]) == "undefined") {
-		json["g" + guildID] = {};
+	console.log(message.guildId);
+    var json = JSON.parse(fs.readFileSync("timers.json"));
+	if(typeof(json["g" + message.guildId]) == "undefined") {
+		json["g" + message.guildId] = [];
 	}
-	json["g" + guildID].message = message;
-	json["g" + guildID].params = parameters;
-	
-	
+	json["g" + message.guildId].push(parameters);
+	console.log(message.channel);
+	message.channel.send("Timer Instantiated.")
+	fs.writeFileSync("timers.json", JSON.stringify(json));
 	
     console.log("100% - closed!")
 }
