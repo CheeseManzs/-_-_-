@@ -40,18 +40,27 @@ async function searchwiki(message, args)
 function mute(msg)
 {
     try{
-        if (!msg.member.hasPermission("MANAGE_MESSAGES")) return msg.channel.send("You don't have the permissions");
-        if (!muteUser) return msg.channel.send("You have to mention a valid member");
-        if (!muteChannel) return msg.channel.send("There's no channel called modlogs");
-        if (!muteRole) return msg.channel.send("There's no role called muted");
-        if (!msg.guild.member(client.user.id).hasPermission("MANAGE_ROLES")) return msg.channel.send("I Don't have permissions");
+        var sender = msg.guild.members.cache.find(m => m.id === msg.author.id)
+        if (!sender.permissions.has("MANAGE_MESSAGES")) return msg.channel.send("You don't have the permissions");
+        if (!sender.permissions.has("MANAGE_ROLES")) return msg.channel.send("I Don't have permissions");
         var muteRole = msg.guild.roles.cache.find(role => role.name.toLowerCase().includes("muted"));
         var muteUser = msg.mentions.members.first();
+        if(muteRole == undefined)
+        {
+            msg.channel.send("There is no 'muted' role!");
+            return;    
+        }
+        if(muteUser == undefined)
+        {
+            msg.channel.send("You need to mention someone to mute!");
+            return;
+        }
         muteUser.roles.add(muteRole);
         msg.channel.send("<@"+muteUser+'> has been muted');
     }catch(err){
-        console.log(err);
+        console.log(err.message);
     }
 }
+
 
 module.exports =  {searchwiki, mute}

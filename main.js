@@ -6,6 +6,8 @@ const fs = require('fs');
 const { Console } = require('console');
 const { Client, Intents, MessageEmbed } = require('discord.js');
 const { text } = require('stream/consumers');
+const { channel } = require('diagnostics_channel');
+const { resolveObjectURL } = require('buffer');
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_PRESENCES, Intents.FLAGS.GUILD_VOICE_STATES, Intents.FLAGS.GUILD_MEMBERS] });
 const token = 'OTA2MjkxMTkyNzI2MTg4MDYy.YYWfcg.qq2O5WSasMmB50X7F4GxeO8vsDk'
 //prefix that people use
@@ -41,14 +43,14 @@ function resolveAfterTSeconds(t) {
 async function getreputation(message, args)
 {   
     try{
-        if(client.guilds.cache.get(message.guildId).members.cache.get(args[0]) != undefined){
+        var target = (args[0]).replace("<","").replace(">","").replace("@","");
+        if(client.guilds.cache.get(message.guildId).members.cache.get(target) != undefined){
             console.log("args[0]: " + args[0])
-            var target = args[0]
             var repvalue = await rep.get_rep(message.guildId, target);
             var reprank = await rep.get_rank(message.guildId, target);
             var oldvalue = repvalue
             var repvalue = Math.round(repvalue*100)
-            var targetname = client.users.cache.find(user => user.id === args[0]).username;
+            var targetname = client.users.cache.find(user => user.id === target).username;
             if(repvalue < Math.ceil(rank_formula(reprank+1)*100) )
             {
 
@@ -78,7 +80,7 @@ async function getreputation(message, args)
                 const newembed = new MessageEmbed()
                 .setColor('#5F676F')
                 .setTitle(targetname)
-                .setImage(client.users.cache.find(user => user.id === args[0]).avatarURL())
+                .setImage(client.users.cache.find(user => user.id === target).avatarURL())
                 .setFooter("Reputation is an indicator of a person's activity and behaviour in a server")
                 .addFields(
                     {name: "Reputation", value: mes},
@@ -87,7 +89,8 @@ async function getreputation(message, args)
                 );
                 message.reply({embeds: [newembed]});
             }
-        }else
+        }
+        else
         {
             message.channel.send("That person is not in this server!")
         }
@@ -106,7 +109,7 @@ function rank_formula(x)
         return -100;
     }else
     {
-        return x + Math.pow(parseFloat(Number(x)), 1.030);
+        return x + Math.pow(parseFloat(Number(x)), 1+config.rank_mult/10);
     }
 }
 function factorial (n) {
@@ -117,11 +120,23 @@ function factorial (n) {
     return f[n] = factorial(n-1) * n;
   }
 
+async function punish(message, collected){
+    var offs = await rep.get_off(message.guildId, message.author.id);
+    console.log("Lowering offenders reputation by " + (-0.05*(offs+1))*config.rep_speed*2.5);
+    message.delete();
+    await rep.modify_user(message.guildId, message.author.id, (-0.05*(offs+1))*config.rep_speed);
+}
+
 
 client.on('messageCreate', async(message) => {
 
-    //reputation monitor
+
+    //spam filter
+    var filter = msg => !(msg.content.toLowerCase() == message.content.toLowerCase() && msg.author.id == message.author.id); // check if the author is the same
+    //detect spam with filter
+    console.log();
     if(message.author.bot){ return;}
+    //reputation monitor
     await rep.init(message.guildId, message.author.id);
     if(message.content.replace(/ /g, "").length >= 4)
     {
@@ -145,8 +160,15 @@ client.on('messageCreate', async(message) => {
             {
                 //rank up
                 var newrank = (targrank-1);
-                await rep.set_rank(message.guildId, message.author.id, newrank); 
+                await rep.set_rank(message.guildId, message.author.id, newrank);
+                if(newrank > rank)
+                {
                 var sentmessage = message.channel.send("<@"+message.author.id+"> has **ranked up!** (Rank **"+(newrank)+"**)");
+                }
+                if(newrank < rank)
+                {
+                var sentmessage = message.channel.send("<@"+message.author.id+"> has **ranked down...** (Rank **"+(newrank)+"**)");
+                }
                 if(config.rank_levels.includes(targrank))
                 {
                     rolename = config.rank_roles[config.rank_levels.indexOf(targrank)]
@@ -201,8 +223,10 @@ client.on('guildMemberAdd', member => {
     // IMPORTANT NOTE: Make Sure To Use async and rename bot to client or whatever name you have for your bot events!
     console.log("new Member!");
     if(!member.bot){
-        const greeting = 'Welcome to '+member.guild.name+', <@' +member+">!\nPlease read the rules in #welcome-and-rules and select your roles in #roles";
         const welcomeChannel = member.guild.channels.cache.find(channel => channel.name === 'greetings');
+        const rulesChannel = member.guild.channels.cache.find(channel => channel.name === 'welcome-and-rules');
+        const rolesChannel = member.guild.channels.cache.find(channel => channel.name === 'roles')
+        const greeting = 'Welcome to '+member.guild.name+', <@' +member+">!\nPlease read the rules in "+rulesChannel.toString()+" and select your roles in "+rolesChannel.toString();
         const newembed = new MessageEmbed()
                 .setColor('#5F676F')
                 .setTitle("Welcome!")

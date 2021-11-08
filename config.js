@@ -7,10 +7,12 @@ rank_roles=["neutral","warming up","active member","saint"]
 rank_levels=[1,2,3,4]
 //the speed at which people gain and lose reputation 
 rep_speed = 1
+//the leveling formula
+rank_mult = 2.5
 
 
 
 
 
 ///DONT EDIT THIS!
-module.exports = {rank_roles, rank_levels, rep_speed}
+module.exports = {rank_roles, rank_levels, rep_speed, rank_mult}

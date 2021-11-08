@@ -39,7 +39,7 @@ async function modify_user(guildID, uID, amt)
             console.log("duplicate insertion");
         }
         var search = "(SELECT value FROM g"+guildID+" WHERE uID ="+uID+")"
-        db.run("UPDATE g"+guildID+" SET value = ("+search+"+"+amt+") WHERE uID="+uID,function(err){if(err){console.log("3: " + err.message)}})
+        db.run("UPDATE g"+guildID+" SET value = ("+search+"+("+amt+")) WHERE uID="+uID,function(err){if(err){console.log("3: " + err.message)}})
         //db.each("SELECT uID, value, offenses FROM g"+guildID, function(err, row){
         //    
         //    if(err){
