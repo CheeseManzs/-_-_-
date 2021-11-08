@@ -193,6 +193,7 @@ client.on('messageCreate', async(message) => {
             message.channel.send("Error trying to evaluate command from request by " + message.author);
         }
     }
+    
 
 });
 
@@ -200,7 +201,7 @@ client.on('guildMemberAdd', member => {
     // IMPORTANT NOTE: Make Sure To Use async and rename bot to client or whatever name you have for your bot events!
     console.log("new Member!");
     if(!member.bot){
-        const greeting = 'Welcome to GVSS Programming and Robotics, <@' +member+">!\nPlease read the rules in #welcome-and-rules and select your roles in #roles";
+        const greeting = 'Welcome to '+member.guild.name+', <@' +member+">!\nPlease read the rules in #welcome-and-rules and select your roles in #roles";
         const welcomeChannel = member.guild.channels.cache.find(channel => channel.name === 'greetings');
         const newembed = new MessageEmbed()
                 .setColor('#5F676F')
