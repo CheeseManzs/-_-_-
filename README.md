@@ -1,2 +1,2 @@
-# ¯\\_(ツ)_/¯
+# ¯\\\_(ツ)\_/¯
 A discord bot with an extremely clever name!
