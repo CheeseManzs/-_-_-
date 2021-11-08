@@ -28,6 +28,9 @@ cmdDict.set('wikipedia', funclib1.searchwiki)
 cmdDict.set('search', funclib1.searchwiki)
 cmdDict.set('mute', funclib1.mute)
 cmdDict.set('settimer', timer.create)
+cmdDict.set('help', help)
+cmdDict.set('info', help)
+cmdDict.set('FAQ', )//add a FAQ function
 
 function resolveAfterTSeconds(t) {
     return new Promise(resolve => {
@@ -45,8 +48,6 @@ async function getreputation(message, args)
 {   
     try{
         if(client.guilds.cache.get(message.guildId).members.cache.get(args[0]) != undefined || args[0] == undefined){
-            console.log("please i just want to see this message show up please" + args[0])
-			console.log(message.author.id);
 			if(args[0] == undefined) {
 				var target = message.author.id;
 			} else {	
@@ -75,7 +76,6 @@ async function getreputation(message, args)
                 var rankbar = "["+rankdis+"]"
                 for(var i = 0; i < 10*scale; i++)
                 {
-                    console.log(i + " - " + roundedpercent)
                     if(i == roundedpercent)
                     {
                         rankbar += "o";
@@ -108,9 +108,20 @@ async function getreputation(message, args)
     }
 }
 
+function help(message, args)
+{
+    message.channel.send("Here is a comprehensive list of commands: ");
+    var funclist = "";
+    var keylist = Array.from(cmdDict.keys()).sort();
+    for(var i = 0; i < keylist.length; i++){
+        funclist += "> "+pre+keylist[i]+"\n";
+    }
+    message.channel.send(funclist);
+}
+
+
 function rank_formula(x)
 {
-    console.log(x);
     if(x <= 0)
     {
         return -100;
@@ -129,18 +140,15 @@ function factorial (n) {
 
 async function punish(message){
     var offs = await rep.get_off(message.guildId, message.author.id);
-    console.log("Lowering offenders reputation by " + (-0.05*(offs*3+1))*config.rep_speed*2.5);
     message.delete();
     await rep.modify_user(message.guildId, message.author.id, (-0.05*(offs*3+1))*config.rep_speed);
 }
 async function raw_punish(uId, gId){
-    console.log(uId);
     var offs = await rep.get_off(gId, uId);
     console.log("Lowering reputation of "+client.guilds.cache.find(g => g.id === gId).members.cache.find(u => u.id = uId).user.username+" by " + (-0.05*(offs*3+1))*config.rep_speed*2.5);
     await rep.modify_user(gId, uId, (-0.05*(offs*3+1))*config.rep_speed);
 }
 async function raw_punish2(author, gId){
-    console.log(author.id);
     var offs = await rep.get_off(gId, author.id);
     console.log("Lowering reputation of "+author.username+" by " + (-0.05*(offs*3+1))*config.rep_speed*2.5);
     await rep.modify_user(gId, author.id, (-0.05*(offs*3+1))*config.rep_speed);
@@ -174,10 +182,6 @@ client.on('messageCreate', async(message) => {
             ++msgs;
             if(parseInt(msgs) === 5)
             {
-                console.log(message.content);
-                console.log(message.author);
-                console.log(message.member.id);
-                console.log("from " + message.guild.members.cache.find(u => u.id = message.member.id).user.username)
                 funclib1.raw_mute2(message.channelId,message.guildId,message.member,client);                
                 await raw_punish2(message.author, message.guildId);
                 
@@ -212,13 +216,11 @@ client.on('messageCreate', async(message) => {
         repu += (0.005/((offenses+1)/5))*config.rep_speed;
         var targrank = rank;
         var rankform = (rank_formula(targrank))
-        console.log(targrank + " | " + rank + " |-| " + rank_formula(targrank) + " | " + repu);
         if(rank != null && rank % 1 == 0)
         {
             while(repu > rank_formula(targrank))
             {
                 targrank++;
-                console.log(targrank + "<- new");
             }
             if((targrank-1) != rank && targrank > 0)
             {
@@ -241,10 +243,6 @@ client.on('messageCreate', async(message) => {
                 }
             }
         }
-        //console.log(offenses)
-        //console.log(offenses+1)
-        //console.log("modified reputation for '" + message.author.username+"'");
-        //console.log(await rep.get_rep(message.guildId, message.author.id))
         //line below is an example on how to get reputation
         //var repval = await rep.get_rep(message.guildId, message.author.id);
     }
