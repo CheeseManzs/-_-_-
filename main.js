@@ -24,7 +24,7 @@ cmdDict.set('wiki', funclib1.searchwiki)
 cmdDict.set('wikipedia', funclib1.searchwiki)
 cmdDict.set('search', funclib1.searchwiki)
 cmdDict.set('mute', funclib1.mute)
-cmdDict.set('set timer', timer.create)
+cmdDict.set('settimer', timer.create)
 
 function resolveAfterTSeconds(t) {
     return new Promise(resolve => {
@@ -181,15 +181,15 @@ client.on('messageCreate', async(message) => {
     }
     //check if it exists and then run the command
     if(cmdDict.get(command) != undefined){
-        try
-        {
+       // try
+        //{
             args.shift();
             cmdDict.get(command)(message, args);
-        }
-        catch
-        {
-            message.channel.send("Error trying to evaluate command from request by " + message.author);
-        }
+       // }
+       // catch (err)
+       // {
+       //     message.channel.send(err.message);
+        //}
     }
 
 });
