@@ -62,5 +62,54 @@ function mute(msg)
     }
 }
 
+function raw_mute(cID, gID, uID, client)
+{
+    try{
+        var guild = client.guilds.cache.find(g => g.id === gID);
+        var channel = guild.channels.cache.find(c => c.id === cID);
+        var muteRole = guild.roles.cache.find(role => role.name.toLowerCase().includes("muted"));
+        var muteUser = guild.members.cache.find(m => m.id = uID);
+        if(muteRole == undefined)
+        {
+            channel.send("There is no 'muted' role!");
+            return;    
+        }
+        if(muteUser == undefined)
+        {
+            channel.send("You need to mention someone to mute!");
+            return;
+        }
+        muteUser.roles.add(muteRole);
+        channel.send("<@"+muteUser+'> has been muted');
+    }catch(err){
+        console.log(err.message);
+    }
+}
+function raw_mute2(cID, gID, author, client)
+{
+    try{
+        var guild = client.guilds.cache.find(g => g.id === gID);
+        var channel = guild.channels.cache.find(c => c.id === cID);
+        var muteRole = guild.roles.cache.find(role => role.name.toLowerCase().includes("muted"));
+        console.log(author.id);
+        var muteUser = author;
+        if(muteRole == undefined)
+        {
+            channel.send("There is no 'muted' role!");
+            return;    
+        }
+        if(muteUser == undefined)
+        {
+            channel.send("You need to mention someone to mute!");
+            return;
+        }
+        muteUser.roles.add(muteRole);
+        channel.send("<@"+muteUser+'> has been muted');
+    }catch(err){
+        console.log(err.message);
+    }
+}
 
-module.exports =  {searchwiki, mute}
+
+
+module.exports =  {searchwiki, mute, raw_mute, raw_mute2}

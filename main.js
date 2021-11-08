@@ -10,6 +10,7 @@ const { channel } = require('diagnostics_channel');
 const { resolveObjectURL } = require('buffer');
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_PRESENCES, Intents.FLAGS.GUILD_VOICE_STATES, Intents.FLAGS.GUILD_MEMBERS] });
 const token = 'OTA2MjkxMTkyNzI2MTg4MDYy.YYWfcg.qq2O5WSasMmB50X7F4GxeO8vsDk'
+const spamMap = new Map();
 //prefix that people use
 const pre = 'sh!'
 //just letting me know when it goes live...
@@ -126,11 +127,23 @@ function factorial (n) {
     return f[n] = factorial(n-1) * n;
   }
 
-async function punish(message, collected){
+async function punish(message){
     var offs = await rep.get_off(message.guildId, message.author.id);
-    console.log("Lowering offenders reputation by " + (-0.05*(offs+1))*config.rep_speed*2.5);
+    console.log("Lowering offenders reputation by " + (-0.05*(offs*3+1))*config.rep_speed*2.5);
     message.delete();
-    await rep.modify_user(message.guildId, message.author.id, (-0.05*(offs+1))*config.rep_speed);
+    await rep.modify_user(message.guildId, message.author.id, (-0.05*(offs*3+1))*config.rep_speed);
+}
+async function raw_punish(uId, gId){
+    console.log(uId);
+    var offs = await rep.get_off(gId, uId);
+    console.log("Lowering reputation of "+client.guilds.cache.find(g => g.id === gId).members.cache.find(u => u.id = uId).user.username+" by " + (-0.05*(offs*3+1))*config.rep_speed*2.5);
+    await rep.modify_user(gId, uId, (-0.05*(offs*3+1))*config.rep_speed);
+}
+async function raw_punish2(author, gId){
+    console.log(author.id);
+    var offs = await rep.get_off(gId, author.id);
+    console.log("Lowering reputation of "+author.username+" by " + (-0.05*(offs*3+1))*config.rep_speed*2.5);
+    await rep.modify_user(gId, author.id, (-0.05*(offs*3+1))*config.rep_speed);
 }
 
 
@@ -139,8 +152,53 @@ client.on('messageCreate', async(message) => {
 
     //spam filter
     var filter = msg => !(msg.content.toLowerCase() == message.content.toLowerCase() && msg.author.id == message.author.id); // check if the author is the same
+    //anti-spam
+    if(spamMap.has(message.author.id))
+    {
+        const data = spamMap.get(message.author.id);
+        const {lastmsg, timer} = data;
+        const diff = message.createdTimestamp - lastmsg.createdTimestamp;
+        var msgs = data.msgs
+        if(diff > 2000)
+        {
+            clearTimeout(timer);
+            data.msgs = 1;
+            data.lastmsg = message;
+            data.timer = setTimeout(() => {
+                spamMap.delete(message.author.id);
+            }, 5000);
+            spamMap.set(message.author.id, data);
+        }
+        else
+        {
+            ++msgs;
+            if(parseInt(msgs) === 5)
+            {
+                console.log(message.content);
+                console.log(message.author);
+                console.log(message.member.id);
+                console.log("from " + message.guild.members.cache.find(u => u.id = message.member.id).user.username)
+                funclib1.raw_mute2(message.channelId,message.guildId,message.member,client);                
+                await raw_punish2(message.author, message.guildId);
+                
+            }else{
+                data.msgs = msgs;
+                spamMap.set(message.author.id, data);
+            }
+        }
+    }else
+    {
+        var authremove = setTimeout(()=>{
+            spamMap.delete(message.author.id);
+        }, 5000)
+        spamMap.set(message.author.id, {
+            msgs: 1,
+            lastmsg: message,
+            timer: authremove
+
+        })
+    }
     //detect spam with filter
-    console.log();
     if(message.author.bot){ return;}
     //reputation monitor
     await rep.init(message.guildId, message.author.id);
