@@ -39,9 +39,15 @@ function resolveAfterTSeconds(t) {
 async function getreputation(message, args)
 {   
     try{
-        if(client.guilds.cache.get(message.guildId).members.cache.get(args[0]) != undefined){
-            console.log("args[0]: " + args[0])
-            var target = args[0]
+        if(client.guilds.cache.get(message.guildId).members.cache.get(args[0]) != undefined || args[0] == undefined){
+            console.log("please i just want to see this message show up please" + args[0])
+			console.log(message.author.id);
+			if(args[0] == undefined) {
+				var target = message.author.id;
+			} else {	
+				var target = args[0]
+			}
+			args[0] = target;
             var repvalue = await rep.get_rep(message.guildId, target);
             var reprank = await rep.get_rank(message.guildId, target);
             var oldvalue = repvalue
