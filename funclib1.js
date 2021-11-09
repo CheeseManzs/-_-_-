@@ -98,8 +98,8 @@ async function forecast(message, args)
             .addFields(
                 {name: "Current Temperature", value: cached[1] + " C"},
                 {name: "Sky Description", value: cached[0]},
-                {name: "Today's Forcasted High", value: cached[2] + " C"},
-                {name: "Today's Forcasted Low", value: cached[3] + " C"}
+                {name: "Today's Forecasted High", value: cached[2] + " C"},
+                {name: "Today's Forecasted Low", value: cached[3] + " C"}
                 //{name: "Forecasted High", value: cached.hi + " C"},
                 //{name: "Forecasted Low", value: cached.lo + " C"},                  
             );
