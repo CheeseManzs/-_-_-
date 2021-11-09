@@ -52,7 +52,7 @@ async function searchwiki(message, args)
 async function forecast(message, args)
 {
 
-    
+    console.log(updatingweathercacher)
     if(updatingweathercacher == false){
         lowercitylist = cityList
         for(var s in lowercitylist)
@@ -61,6 +61,7 @@ async function forecast(message, args)
         }
         var city = "Toronto"
         var cached = null;
+        console.log(args[0]);
         if(args[0] != undefined)
         {
             city = "";
@@ -82,16 +83,22 @@ async function forecast(message, args)
             }
             else
             {
-                cached = WeatherCache.get(city);
+                cached = WeatherCache.get(city.toLowerCase());
             }
         }else
         {
-            cached = WeatherCache.get(city);
+            console.log("Auto searching for cached city: " + city)
+            cached = WeatherCache.get(city.toLowerCase());
+            await resolveAfterTSeconds(1, 10);
+            
         }
         var keys = Array.from(WeatherCache.keys);
-        console.log(keys);
-        
         console.log(cached);
+        if(cached == undefined)
+        {
+            console.log("Cache is undefined. Returing null");
+            return;
+        }
         const newembed = new MessageEmbed()
             .setColor('#5F676F')
             .setTitle("Weather in " + titleCase(city))
@@ -115,42 +122,50 @@ async function forecast(message, args)
 
 async function cacheWeather()
 {
-    try{
-    WeatherCache = new Map();
-    updatingweathercacher = true;
-    console.log("Cacheing weather");
-    for(var i = 0; i < cityList.length; i++)
+    try
     {
-        var citytouse = cityList[i];
-        var cache_arr;
-        await weatherInstance.find({search: cityList[i], degreeType: 'C'}, async function(err, result) {
-            if(err)
-            { 
-                console.log("Search Error: " + err);
-                updatingweathercacher = false;
-                return undefined;
+        WeatherCache = new Map();
+        updatingweathercacher = true;
+        console.log(updatingweathercacher);
+        console.log("Cacheing weather");
+        for(var i = 0; i < cityList.length; i++)
+        {
+            var citytouse = cityList[i];
+            var cache_arr;
+            await weatherInstance.find({search: cityList[i], degreeType: 'C'}, async function(err, result) {
+                if(err)
+                { 
+                    console.log("Search Error: " + err);
+                    updatingweathercacher = false;
+                    return undefined;
 
-            }
-            var resString = JSON.stringify(result, null, 2);
-            var res = JSON.parse(resString);
-            //console.log("\n\n----------RES STRING---------\n\n"+resString);
-            //console.log(res[0].current.temperature);
-            //console.log(res[0].forecast[0].high);
-            var Wcurr = res[0].current.temperature;
-            var Whi = res[0].forecast[0].high;
-            var Wlo = res[0].forecast[0].low;
-            var Wsky = res[0].current.skytext;
-            var to_cache = {sky: Wsky, curr: Wcurr, hi: Whi, lo: Wlo};
-            cache_arr = [Wsky, Wcurr, Whi, Wlo];
-            //console.log(cache_arr)
-            
-          });
-        await resolveAfterTSeconds(0.5, 10);
-        WeatherCache.set(citytouse.toLowerCase(), cache_arr);
-        await resolveAfterTSeconds(0.2, 10);
-    }
-    updatingweathercacher = false;
-    }catch{
+                }
+                var resString = JSON.stringify(result, null, 2);
+                var res = JSON.parse(resString);
+                //console.log("\n\n----------RES STRING---------\n\n"+resString);
+                //console.log(res[0].current.temperature);
+                //console.log(res[0].forecast[0].high);
+                var Wcurr = res[0].current.temperature;
+                var Whi = res[0].forecast[0].high;
+                var Wlo = res[0].forecast[0].low;
+                var Wsky = res[0].current.skytext;
+                updatingweathercacher = true;
+                var to_cache = {sky: Wsky, curr: Wcurr, hi: Whi, lo: Wlo};
+                cache_arr = [Wsky, Wcurr, Whi, Wlo];
+                //
+                
+            });
+            await resolveAfterTSeconds(0.5, 10);
+            console.log(cache_arr)
+            WeatherCache.set(citytouse.toLowerCase(), cache_arr);
+            await resolveAfterTSeconds(0.2, 10);
+            updatingweathercacher = false;
+        }
+        console.log("finished cacheing! (succesful)");
+        console.log(updatingweathercacher);
+    }catch(err){
+        console.log(err.message)
+        console.log("finished cacheing!");
         updatingweathercacher = false;
     }
 
@@ -191,7 +206,7 @@ async function getWeather(city)
         var Wsky = res[0].current.skytext;
         var to_cache = {sky: Wsky, curr: Wcurr, hi: Whi, lo: Wlo};
         cache_arr = [Wsky, Wcurr, Whi, Wlo];
-        //console.log(cache_arr)
+        console.log(cache_arr)
         
         });
     await resolveAfterTSeconds(0.5, 10);
@@ -207,6 +222,7 @@ async function getWeather(city)
     {
         return undefined;
     }
+    
 
 }
 
