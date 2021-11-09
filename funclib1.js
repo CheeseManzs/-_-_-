@@ -12,7 +12,6 @@ cacheWeather();
 var weathercachesystem = setInterval(cacheWeather, 1.8e+6)
 var updatingweathercacher = false;
 
-
 async function searchwiki(message, args)
 {
     
@@ -60,8 +59,8 @@ async function compileJScode(message, args)
     //console.log(code);
     try
     {
-        var func = new Function(code)
-        message.reply("> " + func());
+        var func = new Function("math", "json", code)
+        message.reply("> " + func(Math, JSON));
     }
     catch(err)
     {
@@ -180,6 +179,10 @@ async function cacheWeather()
                 }
                 var resString = JSON.stringify(result, null, 2);
                 var res = JSON.parse(resString);
+                if(res == undefined || res[0] == undefined)
+                {
+                    return;
+                }
                 //console.log("\n\n----------RES STRING---------\n\n"+resString);
                 //console.log(res[0].current.temperature);
                 //console.log(res[0].forecast[0].high);
