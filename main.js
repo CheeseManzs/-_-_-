@@ -21,21 +21,22 @@ client.once('ready', async() => {
 })
 //dictionary of commands
 var cmdDict = new Map();
-cmdDict.set('rep', getreputation)
-cmdDict.set('wiki', funclib1.searchwiki)
-cmdDict.set('wikipedia', funclib1.searchwiki)
-cmdDict.set('search', funclib1.searchwiki)
-cmdDict.set('mute', funclib1.mute)
-cmdDict.set('settimer', timer.create)
-cmdDict.set('help', help)
-cmdDict.set('info', help)
-cmdDict.set('faq', FAQ)//add a FAQ function
-cmdDict.set('forecast', funclib1.forecast);
-cmdDict.set('weather', funclib1.forecast);
-cmdDict.set('math', funclib1.mathExpr);
-cmdDict.set('eval', funclib1.mathExpr);
-cmdDict.set('compile', funclib1.compileJScode);
-cmdDict.set('comp', funclib1.compileJScode);
+var descDict = new Map();
+cmdDict.set('rep', getreputation); descDict.set('rep', "Allows you to view a user's reputation (More info of reputation via the "pre+"FAQ command)");
+cmdDict.set('wiki', funclib1.searchwiki); descDict.set('wiki', "Gives summaries or short answers to inputted terms on wikipedia");
+cmdDict.set('wikipedia', funclib1.searchwiki); descDict.set('wikipedia', "Gives summaries or short answers to inputted terms on wikipedia (duplicate of "+pre+"wiki)")
+cmdDict.set('search', funclib1.searchwiki); descDict.set('search', "Gives summaries or short answers to inputted terms on wikipedia (duplicate of "+pre+"wiki)")
+cmdDict.set('mute', funclib1.mute); descDict.set('mute', "Gives targeted users the 'muted' role if the person using the command has the right permissions")
+cmdDict.set('settimer', timer.create); descDict.set('settime', "Sets a scheduled timer/alarm");
+cmdDict.set('help', help); descDict.set('help', "Duplicate of "+pre+"info");
+cmdDict.set('info', help); descDict.set('info', "Duplicate of "+pre+"help");
+cmdDict.set('faq', FAQ); descDict.set('faq', "A FAQ concerning the functions of this bot");
+cmdDict.set('forecast', funclib1.forecast); descDict.set('forecast', "Gets the temperature and sky description of the inputted city");
+cmdDict.set('weather', funclib1.forecast); descDict.set('weather', "Gets the temperature and sky description of the inputted city (duplicate of "+pre+"forecast)");
+cmdDict.set('math', funclib1.mathExpr); descDict.set('math', "Evaluates a mathematical expression (duplicate of "+pre+"eval)");
+cmdDict.set('eval', funclib1.mathExpr); descDict.set('eval', "Evaluates a mathematical expression (duplicate of "+pre+"math)");
+cmdDict.set('compile', funclib1.compileJScode); descDict.set('compile', "Compiles and runs JavaScipt code; The output is returned as a reply to the command");
+cmdDict.set('comp', funclib1.compileJScode); descDict.set('comp', "Compiles and runs JavaScipt code; The output is returned as a reply to the command (duplicate of "+pre+"compile)");
 
 function resolveAfterTSeconds(t) {
     return new Promise(resolve => {
