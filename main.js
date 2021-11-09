@@ -30,7 +30,7 @@ cmdDict.set('mute', funclib1.mute)
 cmdDict.set('settimer', timer.create)
 cmdDict.set('help', help)
 cmdDict.set('info', help)
-cmdDict.set('FAQ', )//add a FAQ function
+cmdDict.set('faq', FAQ)//add a FAQ function
 
 function resolveAfterTSeconds(t) {
     return new Promise(resolve => {
@@ -108,15 +108,40 @@ async function getreputation(message, args)
     }
 }
 
-function help(message, args)
+async function help(message, args)
 {
-    message.channel.send("Here is a comprehensive list of commands: ");
+    message.reply("Check your DMs")
+    var dm = await message.author.createDM();
+    dm.send("Here is a comprehensive list of commands: ");
     var funclist = "";
     var keylist = Array.from(cmdDict.keys()).sort();
     for(var i = 0; i < keylist.length; i++){
         funclist += "> "+pre+keylist[i]+"\n";
     }
-    message.channel.send(funclist);
+    
+    dm.send(funclist);
+}
+
+async function FAQ(message, args)
+{
+    console.log("sending FAQ");
+    var tosend = (`
+    > **FAQ**
+    \nQ:\n > How did you come up with such a great name?
+    \nA:\n > ¯\\_(ツ)_/¯
+    \nQ:\n > What does "Rank" mean?
+    \nA:\n > A rank is an indication of someone's behaviour on a specific server. If someone is active and follows the rules, they will have a high rank! Furthermore, if someone spams, breaks the rules and does other less enjoyable things, or is new or inactive, they will have a low rank.
+    \nQ:\n > Why do some functions do the same thing?
+    \nA:\n > So you can choose the one you like the most! :thumbsup:
+    \nQ:\n > Do I *have* to call you "¯\\_(ツ)_/¯"?
+    \nA:\n > No! Technically you say whatever you want, but if you want to be official then "Shrug" also works! Coincidentally, you can also verbally pronounce "¯\\_(ツ)_/¯" as "Shrug" instead of "Overscore Blackslash Underscore Opening-Parenthesis Tsu Closing-Parenthesis Underscore Slash Overscore".
+    \nQ:\n > What can you do?
+    \nqL\n > Use the commands "sh!info" or "sh!help" to get a full list of commands.
+    \nQ:\n > Will you sell my information on the underground organ market?
+    \nA:\n > ¯\\_(ツ)_/¯
+    `)
+    var dm = await message.author.createDM();
+    dm.send(tosend);
 }
 
 
@@ -159,6 +184,7 @@ client.on('messageCreate', async(message) => {
 
 
     //spam filter
+    
     var filter = msg => !(msg.content.toLowerCase() == message.content.toLowerCase() && msg.author.id == message.author.id); // check if the author is the same
     //anti-spam
     if(spamMap.has(message.author.id))
