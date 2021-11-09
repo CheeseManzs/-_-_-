@@ -22,7 +22,7 @@ client.once('ready', async() => {
 //dictionary of commands
 var cmdDict = new Map();
 var descDict = new Map();
-cmdDict.set('rep', getreputation); descDict.set('rep', "Allows you to view a user's reputation (More info of reputation via the "pre+"FAQ command)");
+cmdDict.set('rep', getreputation); descDict.set('rep', "Allows you to view a user's reputation (More info of reputation via the "+pre+"FAQ command)");
 cmdDict.set('wiki', funclib1.searchwiki); descDict.set('wiki', "Gives summaries or short answers to inputted terms on wikipedia");
 cmdDict.set('wikipedia', funclib1.searchwiki); descDict.set('wikipedia', "Gives summaries or short answers to inputted terms on wikipedia (duplicate of "+pre+"wiki)")
 cmdDict.set('search', funclib1.searchwiki); descDict.set('search', "Gives summaries or short answers to inputted terms on wikipedia (duplicate of "+pre+"wiki)")
@@ -122,7 +122,7 @@ async function help(message, args)
     var funclist = "";
     var keylist = Array.from(cmdDict.keys()).sort();
     for(var i = 0; i < keylist.length; i++){
-        funclist += "> "+pre+keylist[i]+"\n";
+        funclist += "> "+pre+keylist[i]+": "+descDict.get(keylist[i])+"\n\n";
     }
     
     dm.send(funclist);
