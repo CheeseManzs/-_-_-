@@ -31,6 +31,8 @@ cmdDict.set('settimer', timer.create)
 cmdDict.set('help', help)
 cmdDict.set('info', help)
 cmdDict.set('faq', FAQ)//add a FAQ function
+cmdDict.set('forcast', funclib1.forecast);
+cmdDict.set('weather', funclib1.forecast);
 
 function resolveAfterTSeconds(t) {
     return new Promise(resolve => {
@@ -293,15 +295,18 @@ client.on('messageCreate', async(message) => {
     }
     //check if it exists and then run the command
     if(cmdDict.get(command) != undefined){
-       // try
-        //{
+        try
+        {
             args.shift();
             cmdDict.get(command)(message, args);
-       // }
-       // catch (err)
-       // {
-       //     message.channel.send(err.message);
-        //}
+        }
+        catch (err)
+        {
+            message.channel.send("There was an internal error while trying to execute "+pre+command+".");
+        }
+    }else
+    {
+        message.channel.send(command+" is not an existing command.")    
     }
     
 

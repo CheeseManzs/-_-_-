@@ -1,9 +1,14 @@
 {
   "dependencies": {
+    "@cicciosgamino/openweather-apis": "^5.0.1",
     "cron": "^1.8.2",
     "discord.js": "^13.3.1",
     "fs": "^0.0.1-security",
+    "geoip-lite": "^1.4.2",
+    "ip": "^1.1.5",
+    "openweather-apis": "^4.4.2",
     "sqlite3": "^5.0.2",
+    "weather-js": "^2.0.0",
     "wikijs": "^6.3.2"
   }
 }

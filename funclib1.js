@@ -1,5 +1,16 @@
 const wiki = require('wikijs').default;
+var weatherInstance = require('weather-js');
+const {MessageEmbed } = require('discord.js');
+var geoip = require('geoip-lite');
+var IP = require('ip');
 const config = require('./config')
+var WeatherCache = new Map();
+WeatherCache.set("Doog","Doog!");
+var cityList = ["Toronto", "London", "New York City", "Los Angeles", "Johannesburg", "Hong Kong", "Singapore", "Sydney", "Melbourne", "Chicago", "Houston"]
+cacheWeather();
+var weathercachesystem = setInterval(cacheWeather, 1.8e+6)
+
+
 async function searchwiki(message, args)
 {
     
@@ -36,6 +47,66 @@ async function searchwiki(message, args)
         
     }
 }
+
+function forecast(message, args)
+{
+    var city = "Toronto"
+    if(args[0] != undefined)
+    {
+        city = args[0];
+    }
+    var keys = Array.from(WeatherCache.keys);
+    console.log(keys);
+    var cached = WeatherCache.get(city);
+    console.log(cached);
+    const newembed = new MessageEmbed()
+        .setColor('#5F676F')
+        .setTitle("Weather in " + city)
+        .addFields(
+            {name: "Current Temperature", value: cached[1] + " C"},
+            {name: "Sky Description", value: cached[0]}
+            //{name: "Forecasted High", value: cached.hi + " C"},
+            //{name: "Forecasted Low", value: cached.lo + " C"},                  
+        );
+    message.channel.send({embeds: [newembed]});
+
+}
+
+
+async function cacheWeather()
+{
+    WeatherCache = new Map();
+    console.log("Cacheing weather");
+    for(var i = 0; i < cityList.length; i++)
+    {
+        var citytouse = cityList[i];
+        var cache_arr;
+        await weatherInstance.find({search: cityList[i], degreeType: 'C'}, async function(err, result) {
+            if(err) console.log(err);
+            var resString = JSON.stringify(result, null, 2);
+            var res = JSON.parse(resString);
+            var Wcurr = res[0].current.temperature;
+            var Whi = res[0].current.high;
+            var Wlo = res[0].current.lo;
+            var Wsky = res[0].current.skytext;
+            var to_cache = {sky: Wsky, curr: Wcurr, hi: Whi, lo: Wlo};
+            cache_arr = [Wsky, Wcurr, Whi, Wlo];
+            
+          });
+        await resolveAfterTSeconds(0.2, 10);
+          WeatherCache.set(citytouse, cache_arr);
+    }
+
+}
+
+function resolveAfterTSeconds(t,x) {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        resolve(x);
+      }, t*1000);
+    });
+  }
+
 
 function mute(msg)
 {
@@ -110,6 +181,11 @@ function raw_mute2(cID, gID, author, client)
     }
 }
 
-
-
-module.exports =  {searchwiki, mute, raw_mute, raw_mute2}
+function titleCase(string) 
+{
+    var sentence = string.toLowerCase().split(" ");
+    for(var i = 0; i< sentence.length; i++){
+       sentence[i] = sentence[i][0].toUpperCase() + sentence[i].slice(1);
+    }
+}
+module.exports =  {searchwiki, mute, raw_mute, raw_mute2, forecast}
