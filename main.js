@@ -31,7 +31,7 @@ cmdDict.set('settimer', timer.create)
 cmdDict.set('help', help)
 cmdDict.set('info', help)
 cmdDict.set('faq', FAQ)//add a FAQ function
-cmdDict.set('forcast', funclib1.forecast);
+cmdDict.set('forecast', funclib1.forecast);
 cmdDict.set('weather', funclib1.forecast);
 
 function resolveAfterTSeconds(t) {
