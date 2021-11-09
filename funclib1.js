@@ -9,6 +9,7 @@ WeatherCache.set("Doog","Doog!");
 var cityList = ["Toronto", "London", "New York City", "Los Angeles", "Johannesburg", "Hong Kong", "Singapore", "Sydney", "Melbourne", "Chicago", "Houston"]
 cacheWeather();
 var weathercachesystem = setInterval(cacheWeather, 1.8e+6)
+var updatingweathercacher = false;
 
 
 async function searchwiki(message, args)
@@ -48,56 +49,167 @@ async function searchwiki(message, args)
     }
 }
 
-function forecast(message, args)
+async function forecast(message, args)
 {
-    var city = "Toronto"
-    if(args[0] != undefined)
-    {
-        city = args[0];
+
+    
+    if(updatingweathercacher == false){
+        lowercitylist = cityList
+        for(var s in lowercitylist)
+        {
+            s = s.toLowerCase();
+        }
+        var city = "Toronto"
+        var cached = null;
+        if(args[0] != undefined)
+        {
+            city = "";
+            for(var a = 0; a < args.length; a++)
+            {
+                city += args[a] + " "
+            }
+            console.log("city to search: " + city);
+            city = city.substring(0, city.length-1);
+            console.log("city to search: " + city);
+            if(!lowercitylist.includes(city))
+            {
+                cached = await getWeather(city);
+                if(cached == undefined)
+                {
+                    message.channel.send("> Weather data for "+titleCase(city)+" is unavailable.")
+                    return;
+                }
+            }
+            else
+            {
+                cached = WeatherCache.get(city);
+            }
+        }else
+        {
+            cached = WeatherCache.get(city);
+        }
+        var keys = Array.from(WeatherCache.keys);
+        console.log(keys);
+        
+        console.log(cached);
+        const newembed = new MessageEmbed()
+            .setColor('#5F676F')
+            .setTitle("Weather in " + titleCase(city))
+            .addFields(
+                {name: "Current Temperature", value: cached[1] + " C"},
+                {name: "Sky Description", value: cached[0]},
+                {name: "Today's Forcasted High", value: cached[2] + " C"},
+                {name: "Today's Forcasted Low", value: cached[3] + " C"}
+                //{name: "Forecasted High", value: cached.hi + " C"},
+                //{name: "Forecasted Low", value: cached.lo + " C"},                  
+            );
+        message.channel.send({embeds: [newembed]});
     }
-    var keys = Array.from(WeatherCache.keys);
-    console.log(keys);
-    var cached = WeatherCache.get(city);
-    console.log(cached);
-    const newembed = new MessageEmbed()
-        .setColor('#5F676F')
-        .setTitle("Weather in " + city)
-        .addFields(
-            {name: "Current Temperature", value: cached[1] + " C"},
-            {name: "Sky Description", value: cached[0]}
-            //{name: "Forecasted High", value: cached.hi + " C"},
-            //{name: "Forecasted Low", value: cached.lo + " C"},                  
-        );
-    message.channel.send({embeds: [newembed]});
+    else
+    {
+        message.channel.send("This command is currently unavailable, try again in a few seconds!");
+    }
 
 }
 
 
 async function cacheWeather()
 {
+    try{
     WeatherCache = new Map();
+    updatingweathercacher = true;
     console.log("Cacheing weather");
     for(var i = 0; i < cityList.length; i++)
     {
         var citytouse = cityList[i];
         var cache_arr;
         await weatherInstance.find({search: cityList[i], degreeType: 'C'}, async function(err, result) {
-            if(err) console.log(err);
+            if(err)
+            { 
+                console.log("Search Error: " + err);
+                updatingweathercacher = false;
+                return undefined;
+
+            }
             var resString = JSON.stringify(result, null, 2);
             var res = JSON.parse(resString);
+            //console.log("\n\n----------RES STRING---------\n\n"+resString);
+            //console.log(res[0].current.temperature);
+            //console.log(res[0].forecast[0].high);
             var Wcurr = res[0].current.temperature;
-            var Whi = res[0].current.high;
-            var Wlo = res[0].current.lo;
+            var Whi = res[0].forecast[0].high;
+            var Wlo = res[0].forecast[0].low;
             var Wsky = res[0].current.skytext;
             var to_cache = {sky: Wsky, curr: Wcurr, hi: Whi, lo: Wlo};
             cache_arr = [Wsky, Wcurr, Whi, Wlo];
+            //console.log(cache_arr)
             
           });
+        await resolveAfterTSeconds(0.5, 10);
+        WeatherCache.set(citytouse.toLowerCase(), cache_arr);
         await resolveAfterTSeconds(0.2, 10);
-          WeatherCache.set(citytouse, cache_arr);
+    }
+    updatingweathercacher = false;
+    }catch{
+        updatingweathercacher = false;
     }
 
 }
+
+async function getWeather(city)
+{
+    WeatherCache = new Map();
+    updatingweathercacher = true;
+    console.log("Cacheing weather");
+    var citytouse = titleCase(city);
+    console.log(citytouse);
+    var cache_arr = null;
+    await weatherInstance.find({search: citytouse, degreeType: 'C'}, async function(err, result) {
+        if(err)
+        { 
+            console.log("Search Error: " + err);
+            updatingweathercacher = false;
+            return undefined;
+
+        }
+        var resString = JSON.stringify(result, null, 2);
+        if(resString == undefined)
+        {
+            return undefined;
+        }
+        var res = JSON.parse(resString);
+        if(res == undefined)
+        {
+            return undefined;
+        }
+        //console.log("\n\n----------RES STRING---------\n\n"+resString);
+        //console.log(res[0].current.temperature);
+        //console.log(res[0].forecast[0].high);
+        var Wcurr = res[0].current.temperature;
+        var Whi = res[0].forecast[0].high;
+        var Wlo = res[0].forecast[0].low;
+        var Wsky = res[0].current.skytext;
+        var to_cache = {sky: Wsky, curr: Wcurr, hi: Whi, lo: Wlo};
+        cache_arr = [Wsky, Wcurr, Whi, Wlo];
+        //console.log(cache_arr)
+        
+        });
+    await resolveAfterTSeconds(0.5, 10);
+    if(cache_arr != null)
+    {
+        
+        cityList.push(citytouse);
+        WeatherCache.set(citytouse.toLowerCase(), cache_arr);
+        await resolveAfterTSeconds(0.2, 10);
+        updatingweathercacher = false;
+        return cache_arr;
+    }else
+    {
+        return undefined;
+    }
+
+}
+
 
 function resolveAfterTSeconds(t,x) {
     return new Promise(resolve => {
@@ -187,5 +299,15 @@ function titleCase(string)
     for(var i = 0; i< sentence.length; i++){
        sentence[i] = sentence[i][0].toUpperCase() + sentence[i].slice(1);
     }
+    var final = "";
+    for(var i = 0; i < sentence.length; i++)
+    {
+        final += sentence[i];
+        if(i < sentence.length - 1)
+        {
+            final += " "
+        }
+    }
+    return final;
 }
 module.exports =  {searchwiki, mute, raw_mute, raw_mute2, forecast}

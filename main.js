@@ -302,6 +302,7 @@ client.on('messageCreate', async(message) => {
         }
         catch (err)
         {
+            console.log(err);
             message.channel.send("There was an internal error while trying to execute "+pre+command+".");
         }
     }else
