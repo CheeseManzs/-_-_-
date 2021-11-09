@@ -1,5 +1,5 @@
 const funclib1 = require('./funclib1');
-const config = require('./config')
+const config = require('./config');
 const rep = require('./repsystem')
 const timer = require('./timers')
 const fs = require('fs');
@@ -19,7 +19,6 @@ client.once('ready', async() => {
 
 
 })
-
 //dictionary of commands
 var cmdDict = new Map();
 cmdDict.set('rep', getreputation)
@@ -33,6 +32,10 @@ cmdDict.set('info', help)
 cmdDict.set('faq', FAQ)//add a FAQ function
 cmdDict.set('forecast', funclib1.forecast);
 cmdDict.set('weather', funclib1.forecast);
+cmdDict.set('math', funclib1.mathExpr);
+cmdDict.set('eval', funclib1.mathExpr);
+cmdDict.set('compile', funclib1.compileJScode);
+cmdDict.set('comp', funclib1.compileJScode);
 
 function resolveAfterTSeconds(t) {
     return new Promise(resolve => {

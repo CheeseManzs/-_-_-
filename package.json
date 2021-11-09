@@ -3,6 +3,7 @@
     "@cicciosgamino/openweather-apis": "^5.0.1",
     "cron": "^1.8.2",
     "discord.js": "^13.3.1",
+    "expr-eval": "^2.0.2",
     "fs": "^0.0.1-security",
     "geoip-lite": "^1.4.2",
     "ip": "^1.1.5",

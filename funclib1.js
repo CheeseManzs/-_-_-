@@ -1,4 +1,5 @@
 const wiki = require('wikijs').default;
+const mathEval = require('expr-eval');
 var weatherInstance = require('weather-js');
 const {MessageEmbed } = require('discord.js');
 var geoip = require('geoip-lite');
@@ -46,6 +47,43 @@ async function searchwiki(message, args)
             message.channel.send("¯\\_(ツ)_/¯");
         }
         
+    }
+}
+
+async function compileJScode(message, args)
+{
+    var code = ""
+    for(var i = 0; i < args.length; i++)
+    {
+        code += args[i] + " ";
+    }
+    //console.log(code);
+    try
+    {
+        var func = new Function(code)
+        message.reply("> " + func());
+    }
+    catch(err)
+    {
+        message.reply("> " + err.message);
+    }
+    
+}
+
+async function mathExpr(message, args)
+{
+    try{
+        var expression = ""
+        if(args.length > 0){
+            for(var i = 0; i < args.length; i++)
+            {
+                expression += args[i]
+            }
+            message.reply("> " + mathEval.Parser.evaluate(expression));
+        }
+    }catch
+    {
+        message.reply("That mathematical expression is invalid.")
     }
 }
 
@@ -326,4 +364,4 @@ function titleCase(string)
     }
     return final;
 }
-module.exports =  {searchwiki, mute, raw_mute, raw_mute2, forecast}
+module.exports =  {searchwiki, mute, raw_mute, raw_mute2, forecast, mathExpr, compileJScode}
