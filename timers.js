@@ -2,13 +2,13 @@ const { func } = require('assert-plus');
 
 const sql3 = require('sqlite3').verbose();
 const fs = require('fs');
-
+const CronJob = require('cron').CronJob;
 
 
 function create(message, args)
 {
 	console.log(message);
-	//takes in a recurring timer in the form of "timer [frequency] [number] [hour] [minute]"
+	//takes in a recurring timer in the form of "timer "message" [frequency] [number] [hour] [minute]"
 	//frequency can be daily, weekly, or monthly
 	//if frequency is daily, ignore number
 	//if frequency is weekly, number is 1-7, monday-sunday
@@ -29,21 +29,83 @@ function create(message, args)
 	parameters[3] = parameters[3].substring(0, parameters[3].indexOf(' '));
 	st = st.substring(st.indexOf(' ') + 1);
 	parameters[4] = st;
+	parameters[4] = parameters[4].substring(0, parameters[4].indexOf(' '));
+	parameters[5] = args[args.length-1].substring(2, args[args.length-1].length-1);
 	console.log(parameters[0]);
 	console.log(parameters[1]);
 	console.log(parameters[2]);
 	console.log(parameters[3]);
 	console.log(parameters[4]);
-	console.log(message.guildId);
-    var json = JSON.parse(fs.readFileSync("timers.json"));
-	if(typeof(json["g" + message.guildId]) == "undefined") {
-		json["g" + message.guildId] = [];
+	console.log(parameters[5]);
+	//console.log(message.guildId);
+    
+	
+	var success = 0;
+	var cronstring = "0 ";
+	cronstring += parameters[4];
+	cronstring += " ";
+	cronstring += parameters[3];
+	cronstring += " ";
+	switch(parameters[1].toLowerCase()) {
+		case "daily":
+			cronstring += "*/1 * *";
+			success = 1;
+			break;
+		case "weekly":
+			cronstring += "*/1 * " + parameters[2];
+			success = 1;
+			break;
+		case "monthly":
+			cronstring += parameters[2] + " */1 *";
+			success = 1;
+			break;
+		case "debug":
+			cronstring = "* 21 * * * *";
+			success = 2;
 	}
-	json["g" + message.guildId].push(parameters);
-	console.log(message.channel);
-	message.channel.send("Timer Instantiated.")
-	fs.writeFileSync("timers.json", JSON.stringify(json));
+	if(success == 1) {
+		//TODO: Rewrite this with async functions
+		var json = JSON.parse(fs.readFileSync("timers.json"));
+		if(typeof(json["stored"]) == "undefined") {
+			json["stored"] = [];
+		}
+		json["stored"].push([parameters[0], "c" + parameters[5], cronstring]);
+		console.log(message.channel);
+		message.channel.send("Timer Instantiated.")
+		fs.writeFileSync("timers.json", JSON.stringify(json));
+		console.log(cronstring);
+		const job = new CronJob(cronstring, function() {
+			message.client.channels.fetch(parameters[5])
+			.then(channel => channel.send(parameters[0]));
+			console.log("firing timer.");
+		}, null, 'America/Toronto');
+		job.start();
+	} else if (success == 2) {
+		message.channel.send("Timer Instantiating.")
+		//for(i = 16; i < 24; i++) {
+			cronstring = "* * " + 21 + " * * *";
+			console.log(cronstring);
+			const job = new CronJob(cronstring, function() {
+				message.channel.send(parameters[0]);
+				var x = "firing timer at hour "
+				console.log(x);
+			});
+			job.start();
+		//}
+		
+	} else {
+		message.channel.send("boyyy you fucked up your timer");
+	}
 	
     console.log("100% - closed!")
 }
-module.exports = {create}
+
+function echo(message, args) {
+	console.log(message);
+	console.log(message.channel);
+	console.log(args[0]);
+	//console.log(message.client.channels)
+	message.client.channels.fetch(args[0].substring(2, args[0].length-1))
+	.then(channel => channel.send("echo!"));
+}
+module.exports = {create, echo}
