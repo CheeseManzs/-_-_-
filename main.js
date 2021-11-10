@@ -193,6 +193,7 @@ client.on('messageCreate', async(message) => {
     
     var filter = msg => !(msg.content.toLowerCase() == message.content.toLowerCase() && msg.author.id == message.author.id); // check if the author is the same
     //anti-spam
+    if(message.author.bot){ return;}
     if(spamMap.has(message.author.id))
     {
         const data = spamMap.get(message.author.id);
@@ -235,7 +236,6 @@ client.on('messageCreate', async(message) => {
         })
     }
     //detect spam with filter
-    if(message.author.bot){ return;}
     //reputation monitor
     await rep.init(message.guildId, message.author.id);
     if(message.content.replace(/ /g, "").length >= 4)
