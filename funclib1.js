@@ -1,8 +1,9 @@
 const wiki = require('wikijs').default;
-const Reddit = require('snoowrap')
+const Algebra = require('algebra.js');
+const Reddit = require('snoowrap');
 const mathEval = require('expr-eval');
 var weatherInstance = require('weather-js');
-const {MessageEmbed } = require('discord.js');
+const {MessageEmbed, CommandInteractionOptionResolver } = require('discord.js');
 var geoip = require('geoip-lite');
 var IP = require('ip');
 const config = require('./config')
@@ -160,6 +161,34 @@ async function mathExpr(message, args)
         message.reply("That mathematical expression is invalid.")
     }
 }
+
+async function graph(message, args)
+{
+
+}
+
+function algebra(message, args)
+{
+    try
+    {
+        var expression = ""
+        for(var i = 0; i < args.length; i++)
+        {
+            expression += args[i] + " ";
+        }
+        console.log(Algebra.toTex(Algebra.parse(expression)));
+        var eq = Algebra.parse(expression);
+        message.reply("> " + eq.toString() + "\n> x = **" + eq.solveFor("x")+'**');
+    }
+    catch(err)
+    {   
+        console.log(err);
+        message.channel.send("Failed!");
+    }
+}
+
+
+
 
 async function forecast(message, args)
 {
@@ -442,4 +471,4 @@ function titleCase(string)
     }
     return final;
 }
-module.exports =  {searchwiki, mute, raw_mute, raw_mute2, forecast, mathExpr, compileJScode, grabRedditPost}
+module.exports =  {searchwiki, mute, raw_mute, raw_mute2, forecast, mathExpr, compileJScode, grabRedditPost, algebra}
