@@ -54,7 +54,7 @@ cmdDict.set('eval', funclib1.mathExpr); descDict.set('eval', "Evaluates a mathem
 cmdDict.set('compile', funclib1.compileJScode); descDict.set('compile', "Compiles and runs JavaScipt code; The output is returned as a reply to the command");
 cmdDict.set('comp', funclib1.compileJScode); descDict.set('comp', "Compiles and runs JavaScipt code; The output is returned as a reply to the command (duplicate of "+pre+"compile)");
 cmdDict.set('reddit', funclib1.grabRedditPost); descDict.set('reddit', "Gets a random reddit post from an inputted subreddit");
-cmdDict.set('solve', funclib1.algebra); descDict.set('solve', "Solves an algebraic expression");
+cmdDict.set('solve', funclib1.algebra); descDict.set('solve', "Solves an algebraic equation");
 //cmdDict.set('debug', ); descDict.set('debug', "Allows for people with specific user IDs to run functions without the need for their activation");
 
 function debug(message, args)
