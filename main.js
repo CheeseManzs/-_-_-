@@ -34,9 +34,24 @@ cmdDict.set('faq', FAQ); descDict.set('faq', "A FAQ concerning the functions of 
 cmdDict.set('forecast', funclib1.forecast); descDict.set('forecast', "Gets the temperature and sky description of the inputted city");
 cmdDict.set('weather', funclib1.forecast); descDict.set('weather', "Gets the temperature and sky description of the inputted city (duplicate of "+pre+"forecast)");
 cmdDict.set('math', funclib1.mathExpr); descDict.set('math', "Evaluates a mathematical expression (duplicate of "+pre+"eval)");
+cmdDict.set('eval:', funclib1.mathExpr); descDict.set('eval:', "Evaluates a mathematical expression (duplicate of "+pre+"math)");
 cmdDict.set('eval', funclib1.mathExpr); descDict.set('eval', "Evaluates a mathematical expression (duplicate of "+pre+"math)");
 cmdDict.set('compile', funclib1.compileJScode); descDict.set('compile', "Compiles and runs JavaScipt code; The output is returned as a reply to the command");
 cmdDict.set('comp', funclib1.compileJScode); descDict.set('comp', "Compiles and runs JavaScipt code; The output is returned as a reply to the command (duplicate of "+pre+"compile)");
+cmdDict.set('reddit', funclib1.grabRedditPost); descDict.set('reddit', "Gets a random reddit post from an inputted subreddit");
+//cmdDict.set('debug', ); descDict.set('debug', "Allows for people with specific user IDs to run functions without the need for their activation");
+
+function debug(message, args)
+{
+    if(message.sender == 223904227724886016){
+        var newcommand = args[0]
+        var newargs = args.shift();
+        cmdDict.get(newcommand)(message, newargs);
+    }
+
+}
+
+
 
 function resolveAfterTSeconds(t) {
     return new Promise(resolve => {
@@ -47,7 +62,10 @@ function resolveAfterTSeconds(t) {
   }
 
 
+async function custom(message, args)
+{
 
+}
   
   //reputation should ALWAYS be displayed as the rounded version of rep*100
 async function getreputation(message, args)

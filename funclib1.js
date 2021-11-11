@@ -1,4 +1,5 @@
 const wiki = require('wikijs').default;
+const Reddit = require('snoowrap')
 const mathEval = require('expr-eval');
 var weatherInstance = require('weather-js');
 const {MessageEmbed } = require('discord.js');
@@ -67,6 +68,80 @@ async function compileJScode(message, args)
         message.reply("> " + err.message);
     }
     
+}
+
+async function grabRedditPost(message, args)
+{
+    try{
+    if(args[0] == undefined)
+    {
+        message.channel.send("There is no specified subreddit");
+        return;
+    }
+    var subname = args[0].replace("r/","");
+    const r = new Reddit({
+        userAgent: 'Shrugbot Scraper',
+        username: 'CheeseMansz',
+        password: 'aluken456',
+        clientId: 'mOZCRZGH43Fxry9syTi9AQ',
+        clientSecret: 'Lej3vsrkV3-QF0blKiU3PNNrie-JLw',
+      });
+
+    /** @type {Reddit.Subreddit} */
+    var subreddit = await r.getSubreddit("r/"+subname);
+    if(args[1] == "hot")
+    {
+        var posts = await subreddit.getHot();
+    }
+    else if(args[1] == "new")
+    {
+        var posts = await subreddit.getNew();
+    }
+    else
+    {
+        var posts = [await subreddit.getRandomSubmission()];
+    }
+    
+    
+    /** @type {Reddit.Submission} */
+    var post = posts[Math.floor(Math.random()*posts.length)];
+    if(post == null)
+    {
+        grabRedditPost(message, args);
+        return;
+    }
+    else if(post.over_18)
+    {
+        message.channel.send("Content is marke 18+ so it will not be sent.")
+        return;
+    }
+    
+    if(img != null){
+        /** @type {String} */
+        var img = post.url_overridden_by_dest;
+        if(img.includes('imgur'))
+        {
+            grabRedditPost(message, args);
+            return;
+        }
+    }
+    console.log(post);
+    
+    const newembed = new MessageEmbed()
+        .setColor('#5F676F')
+        .setTitle(post.title)
+        .setFooter("Post by " + post.author.name)
+        .setDescription(post.selftext)
+        .setImage(post.url_overridden_by_dest)
+        .addFields(                
+        );
+    message.channel.send({embeds: [newembed]});
+    }
+    catch(err)
+    {
+        message.reply('Failed to execute that command!');
+        console.log(err);
+    }
 }
 
 async function mathExpr(message, args)
@@ -367,4 +442,4 @@ function titleCase(string)
     }
     return final;
 }
-module.exports =  {searchwiki, mute, raw_mute, raw_mute2, forecast, mathExpr, compileJScode}
+module.exports =  {searchwiki, mute, raw_mute, raw_mute2, forecast, mathExpr, compileJScode, grabRedditPost}
