@@ -3,6 +3,7 @@ const config = require('./config');
 const rep = require('./repsystem')
 const timer = require('./timers')
 const fs = require('fs');
+const CronJob = require('cron').CronJob;
 const { Console } = require('console');
 const { Client, Intents, MessageEmbed } = require('discord.js');
 const { text } = require('stream/consumers');
@@ -16,7 +17,20 @@ const pre = 'sh!'
 //just letting me know when it goes live...
 client.once('ready', async() => {
     console.log("Shrugbot is live!");
-
+	//console.log(client.channels.fetch(907075446280171530));
+	var json = JSON.parse(fs.readFileSync("timers.json"));
+	if(typeof(json["stored"]) == "undefined") {
+		json["stored"] = [];
+	}
+	for(let i = 0; i < json.stored.length; i++) {
+		const job = new CronJob(json.stored[i][2], function() {
+					  console.log(i);
+			client.channels.fetch(json.stored[i][1]).then(channel => channel.send(json.stored[i][0]));
+			console.log("firing timer.");
+		}, null, 'America/Toronto');
+		job.start();
+	}
+	
 
 })
 //dictionary of commands
@@ -28,6 +42,7 @@ cmdDict.set('wikipedia', funclib1.searchwiki); descDict.set('wikipedia', "Gives 
 cmdDict.set('search', funclib1.searchwiki); descDict.set('search', "Gives summaries or short answers to inputted terms on wikipedia (duplicate of "+pre+"wiki)")
 cmdDict.set('mute', funclib1.mute); descDict.set('mute', "Gives targeted users the 'muted' role if the person using the command has the right permissions")
 cmdDict.set('settimer', timer.create); descDict.set('settime', "Sets a scheduled timer/alarm");
+cmdDict.set('echo', timer.echo); descDict.set('echo', "debug feature.");
 cmdDict.set('help', help); descDict.set('help', "Duplicate of "+pre+"info");
 cmdDict.set('info', help); descDict.set('info', "Duplicate of "+pre+"help");
 cmdDict.set('faq', FAQ); descDict.set('faq', "A FAQ concerning the functions of this bot");
