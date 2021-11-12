@@ -383,9 +383,6 @@ async function getWeather(city)
         {
             return undefined;
         }
-        //console.log("\n\n----------RES STRING---------\n\n"+resString);
-        //console.log(res[0].current.temperature);
-        //console.log(res[0].forecast[0].high);
         var Wcurr = res[0].current.temperature;
         var Whi = res[0].forecast[0].high;
         var Wlo = res[0].forecast[0].low;
