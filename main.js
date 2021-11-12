@@ -223,8 +223,7 @@ async function raw_punish2(author, gId){
 client.on('messageCreate', async(message) => {
 
 
-    //spam filter
-    
+    //spam filter   
     var filter = msg => !(msg.content.toLowerCase() == message.content.toLowerCase() && msg.author.id == message.author.id); // check if the author is the same
     //anti-spam
     if(message.author.bot){ return;}
