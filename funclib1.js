@@ -330,20 +330,26 @@ async function cacheWeather()
                 var Wlo = res[0].forecast[0].low;
                 var Wsky = res[0].current.skytext;
                 updatingweathercacher = true;
-                var to_cache = {sky: Wsky, curr: Wcurr, hi: Whi, lo: Wlo};
+                //put the weather data into the array that was created
                 cache_arr = [Wsky, Wcurr, Whi, Wlo];
-                //
+                
                 
             });
+            //there is some delay to make sure no timing errors occur and since this only runs in the background every 30 minutes, there is no harm to the user experience
+            //wait for 0.5 seconds since this takes time and JavaScript runs asynchronously
             await resolveAfterTSeconds(0.5, 10);
             console.log(cache_arr)
             WeatherCache.set(citytouse.toLowerCase(), cache_arr);
+            //wait for 0.2 more seconds for the cache to set in case it takes longer
             await resolveAfterTSeconds(0.2, 10);
             updatingweathercacher = false;
         }
+        //log the finishing of the cache
         console.log("finished cacheing! (succesful)");
         console.log(updatingweathercacher);
-    }catch(err){
+    }catch(err)
+    {
+        //if an unexpected error occurs during the cache, then stop the cache and display the error
         console.log(err.message)
         console.log("finished cacheing!");
         updatingweathercacher = false;
@@ -351,14 +357,14 @@ async function cacheWeather()
 
 }
 
+//use weather.js to get the weather from an inputted city
 async function getWeather(city)
 {
-    WeatherCache = new Map();
-    updatingweathercacher = true;
-    console.log("Cacheing weather");
+    //convert the city to title case
     var citytouse = titleCase(city);
     console.log(citytouse);
     var cache_arr = null;
+    //do the same thing that is done in cacheWeather()
     await weatherInstance.find({search: citytouse, degreeType: 'C'}, async function(err, result) {
         if(err)
         { 
@@ -390,6 +396,7 @@ async function getWeather(city)
         
         });
     await resolveAfterTSeconds(0.5, 10);
+    //check if the cache is NOT null
     if(cache_arr != null)
     {
         
@@ -398,8 +405,10 @@ async function getWeather(city)
         await resolveAfterTSeconds(0.2, 10);
         updatingweathercacher = false;
         return cache_arr;
-    }else
+    }
+    else
     {
+        //if the cache IS null then return undefined
         return undefined;
     }
     
@@ -407,6 +416,7 @@ async function getWeather(city)
 }
 
 
+//a function to halt a function for T seconds
 function resolveAfterTSeconds(t,x) {
     return new Promise(resolve => {
       setTimeout(() => {
@@ -415,38 +425,49 @@ function resolveAfterTSeconds(t,x) {
     });
   }
 
-
+//use discord.js to mute people
 function mute(msg)
 {
-    try{
+    //make sure that if an error occurs, the bot does not crash
+    try
+    {
+        //get the sender of the command
         var sender = msg.guild.members.cache.find(m => m.id === msg.author.id)
+        //if the sender doesnt have permissions then tell the sender and stop the function
         if (!sender.permissions.has("MANAGE_MESSAGES")) return msg.channel.send("You don't have the permissions");
-        if (!sender.permissions.has("MANAGE_ROLES")) return msg.channel.send("I Don't have permissions");
-        var muteRole = msg.guild.roles.cache.find(role => role.name.toLowerCase().includes("muted"));
+        if (!sender.permissions.has("MANAGE_ROLES")) return msg.channel.send("You fon't have the permissions");
+        //get the role that mutes users (it must have 'mute' in its name)
+        var muteRole = msg.guild.roles.cache.find(role => role.name.toLowerCase().includes("mute"));
+        //get the user to mute (the first ping in the message)
         var muteUser = msg.mentions.members.first();
+        //if there is NO mute role then tell the user and stop the function
         if(muteRole == undefined)
         {
             msg.channel.send("There is no 'muted' role!");
             return;    
         }
+        //if there is no person to mute then tell the user and stop the function
         if(muteUser == undefined)
         {
             msg.channel.send("You need to mention someone to mute!");
             return;
         }
+        //give the target the role that mutes users
         muteUser.roles.add(muteRole);
+        //tell the sender that the target has been muted
         msg.channel.send("<@"+muteUser+'> has been muted');
     }catch(err){
         console.log(err.message);
     }
 }
 
+//the same as mute() but it takes in different values to determine the person that should be muted and the role that is used to mute people
 function raw_mute(cID, gID, uID, client)
 {
     try{
         var guild = client.guilds.cache.find(g => g.id === gID);
         var channel = guild.channels.cache.find(c => c.id === cID);
-        var muteRole = guild.roles.cache.find(role => role.name.toLowerCase().includes("muted"));
+        var muteRole = guild.roles.cache.find(role => role.name.toLowerCase().includes("mute"));
         var muteUser = guild.members.cache.find(m => m.id = uID);
         if(muteRole == undefined)
         {
@@ -464,6 +485,7 @@ function raw_mute(cID, gID, uID, client)
         console.log(err.message);
     }
 }
+//the same as mute() and raw_mute() but it takes in unique values to determine the person that should be muted and the role that is used to mute people
 function raw_mute2(cID, gID, author, client)
 {
     try{
@@ -489,6 +511,7 @@ function raw_mute2(cID, gID, author, client)
     }
 }
 
+//converts strings into title case
 function titleCase(string) 
 {
     var sentence = string.toLowerCase().split(" ");
@@ -506,4 +529,5 @@ function titleCase(string)
     }
     return final;
 }
+//the node.js functions to export into main
 module.exports =  {searchwiki, mute, raw_mute, raw_mute2, forecast, mathExpr, compileJScode, grabRedditPost, algebra}
