@@ -243,6 +243,7 @@ async function forecast(message, args)
         const newembed = new MessageEmbed()
             .setColor('#5F676F')
             .setTitle("Weather in " + titleCase(city))
+            .setFooter("When searching, the API chooses the region with the name closest to the one inputted, so if you enter a gibberish name you will still get a city.")
             .addFields(
                 {name: "Current Temperature", value: cached[1] + " C"},
                 {name: "Sky Description", value: cached[0]},

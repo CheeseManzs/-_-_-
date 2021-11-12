@@ -49,7 +49,7 @@ cmdDict.set('faq', FAQ); descDict.set('faq', "A FAQ concerning the functions of 
 cmdDict.set('forecast', funclib1.forecast); descDict.set('forecast', "Gets the temperature and sky description of the inputted city");
 cmdDict.set('weather', funclib1.forecast); descDict.set('weather', "Gets the temperature and sky description of the inputted city (duplicate of "+pre+"forecast)");
 cmdDict.set('math', funclib1.mathExpr); descDict.set('math', "Evaluates a mathematical expression (duplicate of "+pre+"eval)");
-cmdDict.set('eval:', funclib1.mathExpr); descDict.set('eval:', "Evaluates a mathematical expression (duplicate of "+pre+"math)");
+cmdDict.set('eval:', funclib1.mathExpr); descDict.set('eval:', "Evaluates a mathematical expression (duplicate of "+pre+"eval)");
 cmdDict.set('eval', funclib1.mathExpr); descDict.set('eval', "Evaluates a mathematical expression (duplicate of "+pre+"math)");
 cmdDict.set('compile', funclib1.compileJScode); descDict.set('compile', "Compiles and runs JavaScipt code; The output is returned as a reply to the command");
 cmdDict.set('comp', funclib1.compileJScode); descDict.set('comp', "Compiles and runs JavaScipt code; The output is returned as a reply to the command (duplicate of "+pre+"compile)");
