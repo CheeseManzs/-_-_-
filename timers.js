@@ -1,6 +1,5 @@
 const { func } = require('assert-plus');
 
-const sql3 = require('sqlite3').verbose();
 const fs = require('fs');
 const CronJob = require('cron').CronJob;
 
@@ -13,9 +12,9 @@ function create(message, args)
 	//if frequency is daily, ignore number
 	//if frequency is weekly, number is 1-7, monday-sunday
 	//if frequency is monthly, number is 1-31, representing a day
-    let db = new sql3.Database('rep.db');
 	var st = message.content;
 	var parameters = [];
+	//breaks up the message into its arguments and prints it
 	st = st.substring(st.indexOf('"') + 1);
 	parameters[0] = st.substring(0, st.lastIndexOf('"'));
 	st = st.substring(st.lastIndexOf('"') + 2);
@@ -39,7 +38,12 @@ function create(message, args)
 	console.log(parameters[5]);
 	//console.log(message.guildId);
     
-	
+	//converts the parameters into a string used for cron
+	//cronstrings are in the format "second minute hour (day of the month) month (day of the week)"
+	// */1 in a cronstring makes it recurring
+	//honestly you should just google what cron is
+	//success variable is a rudimentary way of validating the cronstring
+	//TODO: actually validate the cronstring
 	var success = 0;
 	var cronstring = "0 ";
 	cronstring += parameters[4];
@@ -65,6 +69,8 @@ function create(message, args)
 	}
 	if(success == 1) {
 		//TODO: Rewrite this with async functions
+		
+		//reads a json file and saves the newly created timer into the appropriate spot in that file
 		var json = JSON.parse(fs.readFileSync("timers.json"));
 		if(typeof(json["stored"]) == "undefined") {
 			json["stored"] = [];
@@ -74,6 +80,7 @@ function create(message, args)
 		message.channel.send("Timer Instantiated.")
 		fs.writeFileSync("timers.json", JSON.stringify(json));
 		console.log(cronstring);
+		//starts a recurring timer
 		const job = new CronJob(cronstring, function() {
 			message.client.channels.fetch(parameters[5])
 			.then(channel => channel.send(parameters[0]));
@@ -81,6 +88,7 @@ function create(message, args)
 		}, null, 'America/Toronto');
 		job.start();
 	} else if (success == 2) {
+		//debug feature do not use it will ruin our rate limits
 		message.channel.send("Timer Instantiating.")
 		//for(i = 16; i < 24; i++) {
 			cronstring = "* * " + 21 + " * * *";
@@ -94,12 +102,13 @@ function create(message, args)
 		//}
 		
 	} else {
-		message.channel.send("boyyy you fucked up your timer");
+		message.channel.send("Timer syntax invalid.");
 	}
 	
     console.log("100% - closed!")
 }
 
+//test function that prints into an arbitrary channel
 function echo(message, args) {
 	console.log(message);
 	console.log(message.channel);
