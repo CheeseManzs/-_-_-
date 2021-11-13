@@ -18,6 +18,8 @@ const pre = 'sh!'
 client.once('ready', async() => {
     console.log("Shrugbot is live!");
 	//console.log(client.channels.fetch(907075446280171530));
+	
+	//reads the json file where all the timers are stored and then starts all of them
 	var json = JSON.parse(fs.readFileSync("timers.json"));
 	if(typeof(json["stored"]) == "undefined") {
 		json["stored"] = [];
@@ -42,7 +44,7 @@ cmdDict.set('wikipedia', funclib1.searchwiki); descDict.set('wikipedia', "Gives 
 cmdDict.set('search', funclib1.searchwiki); descDict.set('search', "Gives summaries or short answers to inputted terms on wikipedia (duplicate of "+pre+"wiki)")
 cmdDict.set('mute', funclib1.mute); descDict.set('mute', "Gives targeted users the 'muted' role if the person using the command has the right permissions")
 cmdDict.set('settimer', timer.create); descDict.set('settime', "Sets a scheduled timer/alarm");
-cmdDict.set('echo', timer.echo); descDict.set('echo', "debug feature.");
+//cmdDict.set('echo', timer.echo); descDict.set('echo', "debug feature.");
 cmdDict.set('help', help); descDict.set('help', "Duplicate of "+pre+"info");
 cmdDict.set('info', help); descDict.set('info', "Duplicate of "+pre+"help");
 cmdDict.set('faq', FAQ); descDict.set('faq', "A FAQ concerning the functions of this bot");
@@ -87,13 +89,16 @@ async function custom(message, args)
 async function getreputation(message, args)
 {   
     try{
+		//gets the pinged user || the sender of the message
         if(client.guilds.cache.get(message.guildId).members.cache.get(args[0]) != undefined || args[0] == undefined){
 			if(args[0] == undefined) {
 				var target = message.author.id;
 			} else {	
 				var target = (args[0]).replace("<","").replace(">","").replace("@","");
 			}
+			
 			args[0] = target;
+			//gets the internal rank and reputation of the target user
             var repvalue = await rep.get_rep(message.guildId, target);
             var reprank = await rep.get_rank(message.guildId, target);
             var oldvalue = repvalue
@@ -101,7 +106,7 @@ async function getreputation(message, args)
             var targetname = client.users.cache.find(user => user.id === target).username;
             if(repvalue < Math.ceil(rank_formula(reprank+1)*100) )
             {
-
+				//converts the internal rank and reputation values into a human-readable representation
                 var mes = "**"+repvalue+"**/**"+Math.ceil(rank_formula(reprank+1)*100)+"**";
                 var rankdis = reprank;
                 if(rankdis == null)
@@ -124,6 +129,7 @@ async function getreputation(message, args)
                     }
                 }
                 rankbar += "["+(rankdis+1)+"]"
+				//prints it out
                 const newembed = new MessageEmbed()
                 .setColor('#5F676F')
                 .setTitle(targetname)
@@ -176,7 +182,7 @@ async function FAQ(message, args)
     \nQ:\n > Do I *have* to call you "¯\\_(ツ)_/¯"?
     \nA:\n > No! Technically you say whatever you want, but if you want to be official then "Shrug" also works! Coincidentally, you can also verbally pronounce "¯\\_(ツ)_/¯" as "Shrug" instead of "Overscore Blackslash Underscore Opening-Parenthesis Tsu Closing-Parenthesis Underscore Slash Overscore".
     \nQ:\n > What can you do?
-    \nqL\n > Use the commands "sh!info" or "sh!help" to get a full list of commands.
+    \nA:\n > Use the commands "sh!info" or "sh!help" to get a full list of commands.
     \nQ:\n > Will you sell my information on the underground organ market?
     \nA:\n > ¯\\_(ツ)_/¯
     `)
@@ -219,13 +225,13 @@ async function raw_punish2(author, gId){
     await rep.modify_user(gId, author.id, (-0.05*(offs*3+1))*config.rep_speed);
 }
 
-
+//lets the bot read messages
 client.on('messageCreate', async(message) => {
 
 
     //spam filter   
     var filter = msg => !(msg.content.toLowerCase() == message.content.toLowerCase() && msg.author.id == message.author.id); // check if the author is the same
-    //anti-spam
+    //anti-spam, deletes messages and mutes people if they type messages too fast
     if(message.author.bot){ return;}
     if(spamMap.has(message.author.id))
     {
