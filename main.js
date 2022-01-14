@@ -54,8 +54,6 @@ cmdDict.set('weather', funclib1.forecast); descDict.set('weather', "Gets the tem
 cmdDict.set('math', funclib1.mathExpr); descDict.set('math', "Evaluates a mathematical expression (duplicate of "+pre+"eval)");
 cmdDict.set('eval:', funclib1.mathExpr); descDict.set('eval:', "Evaluates a mathematical expression (duplicate of "+pre+"eval)");
 cmdDict.set('eval', funclib1.mathExpr); descDict.set('eval', "Evaluates a mathematical expression (duplicate of "+pre+"math)");
-cmdDict.set('compile', funclib1.compileJScode); descDict.set('compile', "Compiles and runs JavaScipt code; The output is returned as a reply to the command");
-cmdDict.set('comp', funclib1.compileJScode); descDict.set('comp', "Compiles and runs JavaScipt code; The output is returned as a reply to the command (duplicate of "+pre+"compile)");
 cmdDict.set('solve', funclib1.algebra); descDict.set('solve', "Solves an algebraic equation");
 //cmdDict.set('debug', ); descDict.set('debug', "Allows for people with specific user IDs to run functions without the need for their activation");
 
@@ -361,8 +359,8 @@ client.on('guildMemberAdd', member => {
     console.log("new Member!");
     if(!member.bot){
         const welcomeChannel = member.guild.channels.cache.find(channel => channel.name === 'greetings');
-        const rulesChannel = member.guild.channels.cache.find(channel => channel.name === 'welcome-and-rules');
-        const rolesChannel = member.guild.channels.cache.find(channel => channel.name === 'roles')
+        const rulesChannel = member.guild.channels.cache.find(channel => channel.name === config_token.rulesChannel);
+        const rolesChannel = member.guild.channels.cache.find(channel => channel.name === config_token.rolesChannel)
         const greeting = 'Welcome to '+member.guild.name+', <@' +member+">!\nPlease read the rules in "+rulesChannel.toString()+" and select your roles in "+rolesChannel.toString();
         const newembed = new MessageEmbed()
                 .setColor('#5F676F')
@@ -370,8 +368,7 @@ client.on('guildMemberAdd', member => {
                 .addFields(
                     {name: "Important Message", value: greeting},              
                 );
-                message.reply({embeds: [newembed]});
-        welcomeChannel.send();
+                welcomeChannel.send({embeds: [newembed]});
     }
 })
   

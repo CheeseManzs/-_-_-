@@ -438,7 +438,7 @@ function mute(msg)
         var sender = msg.guild.members.cache.find(m => m.id === msg.author.id)
         //if the sender doesnt have permissions then tell the sender and stop the function
         if (!sender.permissions.has("MANAGE_MESSAGES")) return msg.channel.send("You don't have the permissions");
-        if (!sender.permissions.has("MANAGE_ROLES")) return msg.channel.send("You fon't have the permissions");
+        if (!sender.permissions.has("MANAGE_ROLES")) return msg.channel.send("You don't have the permissions");
         //get the role that mutes users (it must have 'mute' in its name)
         var muteRole = msg.guild.roles.cache.find(role => role.name.toLowerCase().includes("mute"));
         //get the user to mute (the first ping in the message)
