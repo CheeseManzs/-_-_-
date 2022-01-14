@@ -68,8 +68,6 @@ function create(message, args)
 			success = 2;
 	}
 	if(success == 1) {
-		//TODO: Rewrite this with async functions
-		
 		//reads a json file and saves the newly created timer into the appropriate spot in that file
 		var json = JSON.parse(fs.readFileSync("timers.json"));
 		if(typeof(json["stored"]) == "undefined") {
