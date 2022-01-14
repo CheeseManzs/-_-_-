@@ -3,4 +3,5 @@ rep.db
 rep.db
 runm.bat
 *.json
+!timers.json
 token.js
