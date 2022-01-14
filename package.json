@@ -16,6 +16,7 @@
     "reddit": "^1.2.1",
     "reddit-interfaces": "^1.0.7",
     "snoowrap": "^1.23.0",
+    "sqlite": "^4.0.23",
     "sqlite3": "^5.0.2",
     "weather-js": "^2.0.0",
     "wikijs": "^6.3.2"

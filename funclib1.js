@@ -22,6 +22,7 @@ var updatingweathercacher = false;
 //searches wiki for things inputted in the array args using the wikijs library
 async function searchwiki(message, args)
 {
+    try{
     //check if there are any extra arguments
     if(args.length > 1)
     {
@@ -56,6 +57,11 @@ async function searchwiki(message, args)
             message.channel.send("¯\\_(ツ)_/¯");
         }
         
+    }
+    }
+    catch
+    {
+        message.channel.send("Failed to find article...")
     }
 }
 
