@@ -8,7 +8,6 @@ var geoip = require('geoip-lite');
 var IP = require('ip');
 const config = require('./config')
 var WeatherCache = new Map();
-WeatherCache.set("Doog","Doog!");
 var cityList = ["Toronto", "London", "New York City", "Los Angeles", "Johannesburg", "Hong Kong", "Singapore", "Sydney", "Melbourne", "Chicago", "Houston"]
 
 //cache the current weather
