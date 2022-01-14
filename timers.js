@@ -30,12 +30,13 @@ function create(message, args)
 	parameters[4] = st;
 	parameters[4] = parameters[4].substring(0, parameters[4].indexOf(' '));
 	parameters[5] = args[args.length-1].substring(2, args[args.length-1].length-1);
-	console.log(parameters[0]);
-	console.log(parameters[1]);
-	console.log(parameters[2]);
-	console.log(parameters[3]);
-	console.log(parameters[4]);
-	console.log(parameters[5]);
+	//console.log(parameters[0]);
+	//console.log(parameters[1]);
+	//console.log(parameters[2]);
+	///console.log(parameters[3]);
+	//console.log(parameters[4]);
+	//console.log(parameters[5]);
+	//console.log(message.mentions.channels.first());
 	//console.log(message.guildId);
     
 	//converts the parameters into a string used for cron
@@ -66,6 +67,11 @@ function create(message, args)
 		case "debug":
 			cronstring = "* 21 * * * *";
 			success = 2;
+	}
+	const validate = message.mentions.channels.last().permissionsFor(message.member).has('SEND_MESSAGES', false)
+	console.log(validate);
+	if(!validate) {
+		success = -1
 	}
 	if(success == 1) {
 		//TODO: Rewrite this with async functions
@@ -101,6 +107,8 @@ function create(message, args)
 			job.start();
 		//}
 		
+	} else if(success == -1) {
+		message.channel.send("You don't have permission to create a timer in that channel!");
 	} else {
 		message.channel.send("Timer syntax invalid.");
 	}

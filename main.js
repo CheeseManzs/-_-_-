@@ -44,7 +44,7 @@ cmdDict.set('wiki', funclib1.searchwiki); descDict.set('wiki', "Gives summaries 
 cmdDict.set('wikipedia', funclib1.searchwiki); descDict.set('wikipedia', "Gives summaries or short answers to inputted terms on wikipedia (duplicate of "+pre+"wiki)")
 cmdDict.set('search', funclib1.searchwiki); descDict.set('search', "Gives summaries or short answers to inputted terms on wikipedia (duplicate of "+pre+"wiki)")
 cmdDict.set('mute', funclib1.mute); descDict.set('mute', "Gives targeted users the 'muted' role if the person using the command has the right permissions")
-cmdDict.set('settimer', timer.create); descDict.set('settime', "Sets a scheduled timer/alarm");
+cmdDict.set('settimer', timer.create); descDict.set('settimer', "Sets a recurring timer in the format of <sh!settimer \"Message\" Frequency Number Hour Minute #channel>.\n > Frequency can be \"daily\", \"weekly\", or \"monthly\". Hour is a number between 0-23, and Minute is a number between 0-59. \n > Number determines on what day of the week/month the timer will activate on, and does nothing if Frequency is daily. You cannot create a timer in a channel that you can't send messages into.");
 //cmdDict.set('echo', timer.echo); descDict.set('echo', "debug feature.");
 cmdDict.set('help', help); descDict.set('help', "Duplicate of "+pre+"info");
 cmdDict.set('info', help); descDict.set('info', "Duplicate of "+pre+"help");
