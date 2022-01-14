@@ -1,5 +1,6 @@
 const funclib1 = require('./funclib1');
 const config = require('./config');
+const config_token = require('./token');
 const rep = require('./repsystem')
 const timer = require('./timers')
 const fs = require('fs');
@@ -10,7 +11,7 @@ const { text } = require('stream/consumers');
 const { channel } = require('diagnostics_channel');
 const { resolveObjectURL } = require('buffer');
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_PRESENCES, Intents.FLAGS.GUILD_VOICE_STATES, Intents.FLAGS.GUILD_MEMBERS] });
-const token = config.token;
+const token = config_token.token;
 const spamMap = new Map();
 //prefix that people use
 const pre = 'sh!'
