@@ -98,10 +98,10 @@ async function grabRedditPost(message, args)
         //use snoowrap to connect to the reddit bot that Kenneth set up
         const r = new Reddit({
             userAgent: 'Shrugbot Scraper',
-            username: 'CheeseMansz',
-            password: 'aluken456',
-            clientId: 'mOZCRZGH43Fxry9syTi9AQ',
-            clientSecret: 'Lej3vsrkV3-QF0blKiU3PNNrie-JLw',
+            username: 'no',
+            password: 'no',
+            clientId: 'no',
+            clientSecret: 'no',
         });
         //get the subreddit using snoowrap (it might take a bit depending on the internet connection so its async)
         /** @type {Reddit.Subreddit} */
