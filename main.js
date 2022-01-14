@@ -5,36 +5,26 @@ const timer = require('./timers')
 const fs = require('fs');
 const CronJob = require('cron').CronJob;
 const { Console } = require('console');
-const { Client, Intents, MessageEmbed } = require('discord.js');
+const { Client, Intents, MessageEmbed, Interaction,  } = require('discord.js');
+const { REST } = require('@discordjs/rest');
+const { Routes } = require('discord-api-types/v9');
 const { text } = require('stream/consumers');
 const { channel } = require('diagnostics_channel');
 const { resolveObjectURL } = require('buffer');
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_PRESENCES, Intents.FLAGS.GUILD_VOICE_STATES, Intents.FLAGS.GUILD_MEMBERS] });
 const token = 'OTA2MjkxMTkyNzI2MTg4MDYy.YYWfcg.qq2O5WSasMmB50X7F4GxeO8vsDk'
 const spamMap = new Map();
-//prefix that people use
-const pre = 'sh!'
-//just letting me know when it goes live...
-client.once('ready', async() => {
-    console.log("Shrugbot is live!");
-	//console.log(client.channels.fetch(907075446280171530));
-	
-	//reads the json file where all the timers are stored and then starts all of them
-	var json = JSON.parse(fs.readFileSync("timers.json"));
-	if(typeof(json["stored"]) == "undefined") {
-		json["stored"] = [];
-	}
-	for(let i = 0; i < json.stored.length; i++) {
-		const job = new CronJob(json.stored[i][2], function() {
-					  console.log(i);
-			client.channels.fetch(json.stored[i][1]).then(channel => channel.send(json.stored[i][0]));
-			console.log("firing timer.");
-		}, null, 'America/Toronto');
-		job.start();
-	}
-	
 
-})
+const commands = [];
+const clientId = '123456789012345678';
+const guildId = '876543210987654321';
+
+//FINISH SLASH FUNCTIONS
+
+//prefix that people use
+const pre = '/sh '
+//just letting me know when it goes live...
+
 //dictionary of commands
 var cmdDict = new Map();
 var descDict = new Map();
@@ -58,6 +48,38 @@ cmdDict.set('comp', funclib1.compileJScode); descDict.set('comp', "Compiles and 
 cmdDict.set('reddit', funclib1.grabRedditPost); descDict.set('reddit', "Gets a random reddit post from an inputted subreddit");
 cmdDict.set('solve', funclib1.algebra); descDict.set('solve', "Solves an algebraic equation");
 //cmdDict.set('debug', ); descDict.set('debug', "Allows for people with specific user IDs to run functions without the need for their activation");
+
+client.once('ready', async() => {
+    console.log("Shrugbot is live!");
+	//console.log(client.channels.fetch(907075446280171530));
+	
+	//reads the json file where all the timers are stored and then starts all of them
+	var json = JSON.parse(fs.readFileSync("timers.json"));
+	if(typeof(json["stored"]) == "undefined") {
+		json["stored"] = [];
+	}
+	for(let i = 0; i < json.stored.length; i++) {
+		const job = new CronJob(json.stored[i][2], function() {
+					  console.log(i);
+			client.channels.fetch(json.stored[i][1]).then(channel => channel.send(json.stored[i][0]));
+			console.log("firing timer.");
+		}, null, 'America/Toronto');
+		job.start();
+	}
+    var parsedCommands = Array.from(cmdDict.keys())
+    console.log(parsedCommands)
+    for(var k in parsedCommands)
+    {
+        var key = parsedCommands[k]
+        console.log("creating command /"+key)
+        client.application.commands.create({
+            name: key,
+            description: descDict.get(key)
+        })
+    }
+	
+
+})
 
 function debug(message, args)
 {
@@ -357,7 +379,7 @@ client.on('messageCreate', async(message) => {
 });
 
 client.on('guildMemberAdd', member => {
-    // IMPORTANT NOTE: Make Sure To Use async and rename bot to client or whatever name you have for your bot events!
+    //IMPORTANT NOTE: Make sure To use async and rename bot to client or whatever name you have for your bot events
     console.log("new Member!");
     if(!member.bot){
         const welcomeChannel = member.guild.channels.cache.find(channel => channel.name === 'greetings');
