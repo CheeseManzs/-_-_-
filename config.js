@@ -9,10 +9,10 @@ rank_levels=[1,2,3,4]
 rep_speed = 1
 //the leveling formula
 rank_mult = 2.5
-
+token = 'OTA2MjkxMTkyNzI2MTg4MDYy.YYWfcg.qq2O5WSasMmB50X7F4GxeO8vsDk'
 
 
 
 
 ///DONT EDIT THIS!
-module.exports = {rank_roles, rank_levels, rep_speed, rank_mult}
+module.exports = {rank_roles, rank_levels, rep_speed, rank_mult, token}

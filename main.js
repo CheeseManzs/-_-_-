@@ -10,7 +10,7 @@ const { text } = require('stream/consumers');
 const { channel } = require('diagnostics_channel');
 const { resolveObjectURL } = require('buffer');
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_PRESENCES, Intents.FLAGS.GUILD_VOICE_STATES, Intents.FLAGS.GUILD_MEMBERS] });
-const token = 'OTA2MjkxMTkyNzI2MTg4MDYy.YYWfcg.qq2O5WSasMmB50X7F4GxeO8vsDk'
+const token = config.token;
 const spamMap = new Map();
 //prefix that people use
 const pre = 'sh!'
