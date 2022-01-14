@@ -1,2 +1,3 @@
 # ¯\\\_(ツ)\_/¯
-A discord bot with an extremely clever name!
+DO NOT USE THIS BUILD, THE OFFICIAL BUILD IS IN THE STABLE BRANCH!!!!!
+
